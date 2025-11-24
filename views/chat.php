@@ -21,12 +21,11 @@ $current_page = 'chat';
   </div>
 </section>
 
-<?php if (!empty($_GET['prompt'])): ?>
-  <section aria-labelledby="results-heading">
-    <h2 id="results-heading">Results</h2>
-    <div class="card">
-      <p>Search functionality will be implemented in future sprints. For now, try the <a href="index.php?action=match">Recipe Matcher</a> to find recipes based on your pantry ingredients.</p>
-    </div>
-  </section>
-<?php endif; ?>
+<section aria-labelledby="results-heading" id="chat-results" style="display: none;">
+  <h2 id="results-heading">Response</h2>
+  <div class="card" id="chat-response">
+    <div class="loading" style="margin: 0 auto 1rem; display: block;"></div>
+    <p style="text-align: center; color: var(--muted);">Thinking...</p>
+  </div>
+</section>
 

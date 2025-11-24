@@ -1,7 +1,7 @@
 <!--
 Deployed URL: https://cs4640.cs.virginia.edu/juh7hc/
 Authors: Jeremy Ky, Ashley Wu, Shaunak Sinha
-CS 4640 Sprint 3
+CS 4640 Sprint 4
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -26,6 +26,7 @@ CS 4640 Sprint 3
         <a href="index.php?action=pantry" <?= ($current_page ?? '') === 'pantry' ? 'aria-current="page"' : '' ?>>Pantry</a>
         <a href="index.php?action=match" <?= ($current_page ?? '') === 'match' ? 'aria-current="page"' : '' ?>>Match</a>
         <a href="index.php?action=cook" <?= ($current_page ?? '') === 'cook' ? 'aria-current="page"' : '' ?>>Cook</a>
+        <a href="index.php?action=about" <?= ($current_page ?? '') === 'about' ? 'aria-current="page"' : '' ?>>About</a>
       </nav>
     </div>
   </header>

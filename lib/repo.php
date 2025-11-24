@@ -15,6 +15,9 @@ require_once __DIR__ . '/db.php';
  */
 function get_recipes($userId, $filters = []) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return []; // Return empty array if no database connection
+    }
     
     $sql = "SELECT r.*, COUNT(ri.id) as ingredient_count
             FROM recipe r
@@ -43,6 +46,9 @@ function get_recipes($userId, $filters = []) {
  */
 function get_recipe($recipeId, $userId) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return false; // Return false if no database connection
+    }
     
     $stmt = $pdo->prepare("SELECT * FROM recipe WHERE id = :id AND user_id = :user_id");
     $stmt->execute(['id' => $recipeId, 'user_id' => $userId]);
@@ -56,6 +62,9 @@ function get_recipe($recipeId, $userId) {
  */
 function get_recipe_ingredients($recipeId) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return []; // Return empty array if no database connection
+    }
     
     $stmt = $pdo->prepare("SELECT line FROM recipe_ingredient WHERE recipe_id = :id ORDER BY id");
     $stmt->execute(['id' => $recipeId]);
@@ -70,6 +79,9 @@ function get_recipe_ingredients($recipeId) {
  */
 function save_recipe($userId, $data) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return 0; // Return 0 if no database connection
+    }
     
     $stmt = $pdo->prepare("
         INSERT INTO recipe (user_id, title, image_url, steps)
@@ -94,6 +106,9 @@ function save_recipe($userId, $data) {
  */
 function save_recipe_ingredients($recipeId, $lines) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return; // Return early if no database connection
+    }
     
     $stmt = $pdo->prepare("INSERT INTO recipe_ingredient (recipe_id, line) VALUES (:recipe_id, :line)");
     
@@ -114,6 +129,9 @@ function save_recipe_ingredients($recipeId, $lines) {
  */
 function update_recipe($recipeId, $userId, $data) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return false; // Return false if no database connection
+    }
     
     $stmt = $pdo->prepare("
         UPDATE recipe 
@@ -138,6 +156,9 @@ function update_recipe($recipeId, $userId, $data) {
  */
 function delete_recipe($recipeId, $userId) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return false; // Return false if no database connection
+    }
     
     $stmt = $pdo->prepare("DELETE FROM recipe WHERE id = :id AND user_id = :user_id");
     return $stmt->execute(['id' => $recipeId, 'user_id' => $userId]);
@@ -150,6 +171,9 @@ function delete_recipe($recipeId, $userId) {
  */
 function get_pantry($userId) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return []; // Return empty array if no database connection
+    }
     
     $stmt = $pdo->prepare("SELECT * FROM pantry_item WHERE user_id = :user_id ORDER BY created_at DESC");
     $stmt->execute(['user_id' => $userId]);
@@ -164,6 +188,9 @@ function get_pantry($userId) {
  */
 function add_pantry_item($userId, $data) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return 0; // Return 0 if no database connection
+    }
     
     $stmt = $pdo->prepare("
         INSERT INTO pantry_item (user_id, ingredient, quantity, unit)
@@ -189,6 +216,9 @@ function add_pantry_item($userId, $data) {
  */
 function delete_pantry_item($itemId, $userId) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return false; // Return false if no database connection
+    }
     
     $stmt = $pdo->prepare("DELETE FROM pantry_item WHERE id = :id AND user_id = :user_id");
     return $stmt->execute(['id' => $itemId, 'user_id' => $userId]);
@@ -203,6 +233,9 @@ function delete_pantry_item($itemId, $userId) {
  */
 function update_pantry_item($itemId, $userId, $data) {
     $pdo = db_connect();
+    if ($pdo === null) {
+        return false; // Return false if no database connection
+    }
     
     $stmt = $pdo->prepare("
         UPDATE pantry_item

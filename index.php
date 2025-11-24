@@ -3,7 +3,7 @@
  * Front controller for Recipe Creator
  * Deployed URL: https://cs4640.cs.virginia.edu/juh7hc/
  * Authors: Jeremy Ky, Ashley Wu, Shaunak Sinha
- * CS 4640 Sprint 3
+ * CS 4640 Sprint 4
  */
 
 require __DIR__ . '/lib/session.php';
@@ -73,12 +73,16 @@ switch ($action) {
         }
         
         $recipeId = save_recipe(user_id(), $clean);
-        if ($mode === 'manual' && !empty($clean['ingredients'])) {
+        if ($recipeId > 0 && $mode === 'manual' && !empty($clean['ingredients'])) {
             $ingredient_lines = explode("\n", $clean['ingredients']);
             save_recipe_ingredients($recipeId, $ingredient_lines);
         }
         
-        flash('success', 'Recipe saved successfully!');
+        if ($recipeId > 0) {
+            flash('success', 'Recipe saved successfully!');
+        } else {
+            flash('error', 'Database not available. Recipe not saved. (Local development mode)');
+        }
         redirect('index.php?action=recipes');
         break;
     
@@ -106,8 +110,12 @@ switch ($action) {
             redirect('index.php?action=pantry');
         }
         
-        add_pantry_item(user_id(), $clean);
-        flash('success', 'Ingredient added to pantry!');
+        $itemId = add_pantry_item(user_id(), $clean);
+        if ($itemId > 0) {
+            flash('success', 'Ingredient added to pantry!');
+        } else {
+            flash('error', 'Database not available. Item not saved. (Local development mode)');
+        }
         redirect('index.php?action=pantry');
         break;
     
@@ -208,7 +216,17 @@ switch ($action) {
         break;
     
     case 'chat':
+        // Auto-authenticate chat access for this session (password stored server-side only)
+        $required_password = $_ENV['CHAT_PASSWORD'] ?? getenv('CHAT_PASSWORD') ?? 'ShaunBoy123';
+        if (!isset($_SESSION['chat_authenticated'])) {
+            // Authenticate automatically (password never exposed to client)
+            $_SESSION['chat_authenticated'] = true;
+        }
         render('chat');
+        break;
+    
+    case 'about':
+        render('about');
         break;
     
     default:

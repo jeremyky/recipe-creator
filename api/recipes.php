@@ -30,7 +30,7 @@ if (!empty($cuisine)) {
     $filters['cuisine'] = $cuisine;
 }
 
-// Get recipes
+// Get recipes (will return empty array if no database connection)
 $recipes = get_recipes(user_id(), $filters);
 
 // Paginate results

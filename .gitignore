@@ -1,25 +1,43 @@
-# Environment variables (contains passwords)
+# Environment variables
 .env
+.env.local
+.env.*.local
 
-# Test/debug files
-check_database.php
-test_connection.php
-quick_test.php
-init_db.php
-populate_sample_data.php
+# Markdown files (except README.md)
+*.md
+!README.md
 
-# Temporary files
-*.log
-*.tmp
-error_log
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# IDE files
-.idea/
-.vscode/
-*.swp
-*.swo
+# Logs
+*.log
+logs/
 
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database
+*.sqlite
+*.db
+
+# Composer
+vendor/
+composer.lock
+
+# Node modules (if any)
+node_modules/
+
+# Build files
+build/
+dist/

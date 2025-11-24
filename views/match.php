@@ -40,7 +40,10 @@ $max_missing = $max_missing ?? 3;
             <?php if (intval($recipe['missing_count']) === 0): ?>
               <span class="badge badge--success">100% match</span>
             <?php else: ?>
-              <span class="badge badge--warning">Missing <?= h($recipe['missing_count']) ?></span>
+              <span class="badge badge--warning">
+                <span style="display: block; text-align: center; line-height: 1.2;">MISSING</span>
+                <span style="display: block; text-align: center; font-size: 1.1em; font-weight: 700; margin-top: 2px;"><?= h($recipe['missing_count']) ?></span>
+              </span>
             <?php endif; ?>
           </div>
           <p class="recipe-meta">

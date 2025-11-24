@@ -1,268 +1,207 @@
 <?php
 /**
- * Populate Database with Sample Data (plain-text output)
- * Visit: https://cs4640.cs.virginia.edu/juh7hc/recipe-creator/populate_sample_data.php
- * Delete this file after seeding.
+ * Populate sample data for Recipe Creator
+ * Authors: Jeremy Ky, Ashley Wu, Shaunak Sinha
+ * CS 4640 Sprint 4
  */
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
+require __DIR__ . '/lib/session.php';
+require __DIR__ . '/lib/util.php';
 require __DIR__ . '/lib/db.php';
 require __DIR__ . '/lib/repo.php';
-require __DIR__ . '/lib/session.php';
 
-function slugify($s) {
-    $s = strtolower(trim($s));
-    $s = preg_replace('~[^a-z0-9]+~', '-', $s);
-    return trim($s, '-');
+$pdo = db_connect();
+if ($pdo === null) {
+    die("Database connection failed. Please ensure PostgreSQL is running.");
 }
 
-$pdo = function_exists('db') ? db() : db_connect();
-$userId = function_exists('user_id') ? user_id() : 1;
-if (!$userId) $userId = 1;
+$userId = 1; // Demo user
 
-/* wrappers to support either your repo helpers or direct PDO */
-if (!function_exists('repo_add_pantry_item')) {
-    function repo_add_pantry_item($userId, $item) {
-        if (function_exists('add_pantry_item')) {
-            return add_pantry_item($userId, $item);
-        }
-        global $pdo;
-        $sql = 'INSERT INTO pantry_item (user_id, ingredient, quantity, unit)
-                VALUES (:uid,:ing,:qty,:unit)';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            ':uid'  => $userId,
-            ':ing'  => $item['ingredient'],
-            ':qty'  => $item['quantity'],
-            ':unit' => $item['unit'],
-        ]);
-    }
-}
-
-if (!function_exists('repo_save_recipe')) {
-    function repo_save_recipe($userId, $data) {
-        if (function_exists('save_recipe')) {
-            return save_recipe($userId, $data);
-        }
-        global $pdo;
-        $stmt = $pdo->prepare('INSERT INTO recipe (user_id,title,image_url,steps)
-                               VALUES (:uid,:t,:img,:steps) RETURNING id');
-        $stmt->execute([
-            ':uid'   => $userId,
-            ':t'     => $data['title'],
-            ':img'   => $data['image_url'],
-            ':steps' => $data['steps'],
-        ]);
-        return (int)$stmt->fetchColumn();
-    }
-}
-
-if (!function_exists('repo_save_recipe_ingredients')) {
-    function repo_save_recipe_ingredients($recipeId, array $lines) {
-        if (function_exists('save_recipe_ingredients')) {
-            return save_recipe_ingredients($recipeId, $lines);
-        }
-        global $pdo;
-        $stmt = $pdo->prepare('INSERT INTO recipe_ingredient (recipe_id,line) VALUES (:rid,:line)');
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') continue;
-            $stmt->execute([':rid' => $recipeId, ':line' => $line]);
-        }
-    }
-}
-
-/* recipes with real image URLs */
-$recipes = [
-    'Spaghetti Carbonara' => [
-        'image_url' => 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&h=600&fit=crop',
-        'steps' => "1. Boil water and cook spaghetti until al dente\n2. Cook pancetta until crispy\n3. Beat eggs with parmesan cheese\n4. Toss hot pasta with pancetta and egg mixture\n5. Season with black pepper and serve",
-        'ingredients' => [
-            '1 lb spaghetti',
-            '4 oz pancetta, diced',
-            '3 large eggs',
-            '1 cup parmesan cheese, grated',
-            'Black pepper to taste'
-        ],
-    ],
-    'Chicken Tikka Masala' => [
-        'image_url' => 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&h=600&fit=crop',
-        'steps' => "1. Marinate chicken in yogurt and spices\n2. Brown chicken\n3. Saute onions and garlic\n4. Add tomatoes, cream, and spices\n5. Simmer and add chicken\n6. Serve with rice",
-        'ingredients' => [
-            '2 lbs chicken breast, cubed',
-            '1 cup plain yogurt',
-            '2 tbsp tikka masala spice',
-            '1 can diced tomatoes',
-            '1/2 cup heavy cream',
-            '1 onion, diced',
-            '3 cloves garlic, minced',
-            'Basmati rice'
-        ],
-    ],
-    'Tacos Al Pastor' => [
-        'image_url' => 'https://images.unsplash.com/photo-1565299585323-38174c1d5d1a?w=800&h=600&fit=crop',
-        'steps' => "1. Marinate pork with pineapple and spices\n2. Grill or roast pork\n3. Warm tortillas\n4. Serve with onion, cilantro, pineapple\n5. Add lime and hot sauce",
-        'ingredients' => [
-            '2 lbs pork shoulder, sliced',
-            '1 cup pineapple, diced',
-            '1 onion, sliced',
-            'Fresh cilantro',
-            'Corn tortillas',
-            'Lime wedges'
-        ],
-    ],
-    'Beef Stir Fry' => [
-        'image_url' => 'https://images.unsplash.com/photo-1563379091339-03246963d19a?w=800&h=600&fit=crop',
-        'steps' => "1. Slice beef thinly\n2. Stir fry beef; remove\n3. Stir fry vegetables\n4. Add sauce and return beef\n5. Serve over rice",
-        'ingredients' => [
-            '1 lb beef sirloin, sliced',
-            '2 bell peppers, sliced',
-            '1 onion, sliced',
-            '2 tbsp soy sauce',
-            '1 tbsp oyster sauce',
-            '2 cloves garlic, minced',
-            'Cooked white rice'
-        ],
-    ],
-    'Margherita Pizza' => [
-        'image_url' => 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&h=600&fit=crop',
-        'steps' => "1. Preheat oven to 475 F\n2. Roll dough\n3. Spread tomato sauce\n4. Add mozzarella and basil\n5. Drizzle oil, bake 10 to 12 min",
-        'ingredients' => [
-            '1 pizza dough',
-            '1/2 cup tomato sauce',
-            '8 oz fresh mozzarella',
-            'Fresh basil leaves',
-            '2 tbsp olive oil'
-        ],
-    ],
-    'Pad Thai' => [
-        'image_url' => 'https://images.unsplash.com/photo-1559314809-0c8c4a1a5d5e?w=800&h=600&fit=crop',
-        'steps' => "1. Soak rice noodles\n2. Scramble eggs; set aside\n3. Cook shrimp\n4. Add noodles and sauce\n5. Toss with sprouts and peanuts\n6. Serve with lime",
-        'ingredients' => [
-            '8 oz rice noodles',
-            '1/2 lb shrimp',
-            '2 eggs',
-            '2 tbsp fish sauce',
-            '2 tbsp tamarind paste',
-            '1/2 cup bean sprouts',
-            '1/4 cup peanuts, crushed',
-            'Lime wedges'
-        ],
-    ],
-    'Greek Salad' => [
-        'image_url' => 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&h=600&fit=crop',
-        'steps' => "1. Dice tomatoes and cucumber\n2. Slice red onion\n3. Crumble feta\n4. Combine with olives\n5. Dress with oil and lemon; oregano, salt",
-        'ingredients' => [
-            '2 tomatoes, diced',
-            '1 cucumber, diced',
-            '1 red onion, sliced',
-            '6 oz feta cheese',
-            '1/2 cup kalamata olives',
-            '3 tbsp olive oil',
-            '1 lemon, juiced',
-            'Dried oregano'
-        ],
-    ],
-    'Chicken Noodle Soup' => [
-        'image_url' => 'https://images.unsplash.com/photo-1572441713132-51c75654db73?w=800&h=600&fit=crop',
-        'steps' => "1. Simmer chicken with vegetables\n2. Shred chicken\n3. Add noodles to broth\n4. Return chicken\n5. Season and serve",
-        'ingredients' => [
-            '2 lbs chicken thighs',
-            '8 cups chicken broth',
-            '2 carrots, sliced',
-            '2 celery stalks, sliced',
-            '1 onion, diced',
-            '8 oz egg noodles',
-            'Salt and pepper'
-        ],
-    ],
-];
-
-/* pantry items */
-$pantry_items = [
-    ['ingredient' => 'Chicken Breast', 'quantity' => 2.5, 'unit' => 'lb'],
-    ['ingredient' => 'Garlic',         'quantity' => 1,   'unit' => 'piece'],
-    ['ingredient' => 'Olive Oil',      'quantity' => 500, 'unit' => 'ml'],
-    ['ingredient' => 'Rice',           'quantity' => 2,   'unit' => 'kg'],
-    ['ingredient' => 'Broccoli',       'quantity' => 1,   'unit' => 'lb'],
-    ['ingredient' => 'Eggs',           'quantity' => 12,  'unit' => 'piece'],
-    ['ingredient' => 'Flour',          'quantity' => 5,   'unit' => 'cup'],
-    ['ingredient' => 'Salt',           'quantity' => 1,   'unit' => 'tsp'],
-    ['ingredient' => 'Soy Sauce',      'quantity' => 250, 'unit' => 'ml'],
-    ['ingredient' => 'Onion',          'quantity' => 3,   'unit' => 'piece'],
-];
-
-/* HTML output */
 echo "<!DOCTYPE html><html><head><title>Populate Sample Data</title>";
-echo "<style>body{font-family:ui-monospace,Menlo,monospace;padding:20px;line-height:1.6}
-.ok{color:#16a34a}.error{color:#dc2626} code{background:#111827;color:#e5e7eb;padding:2px 6px;border-radius:6px}</style>";
+echo "<style>body{font-family:system-ui;padding:2rem;max-width:800px;margin:0 auto;} .ok{color:#10b981;} .error{color:#b91c1c;} pre{background:#f5f5f5;padding:1rem;border-radius:8px;}</style>";
 echo "</head><body><h1>Populating Sample Data</h1>";
 
-echo "<h2>Adding Recipes</h2>";
+// Sample recipes
+$sampleRecipes = [
+    [
+        'title' => 'Classic Spaghetti Carbonara',
+        'image_url' => 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800',
+        'steps' => "1. Boil water and cook spaghetti until al dente\n2. Cook pancetta in a large pan until crispy\n3. Whisk eggs and parmesan cheese together\n4. Drain pasta, reserving some pasta water\n5. Toss hot pasta with pancetta, then mix in egg mixture\n6. Add pasta water if needed for creaminess\n7. Season with black pepper and serve immediately",
+        'ingredients' => [
+            "1 lb spaghetti",
+            "8 oz pancetta, diced",
+            "4 large eggs",
+            "1 cup grated parmesan cheese",
+            "Black pepper to taste",
+            "Salt for pasta water"
+        ]
+    ],
+    [
+        'title' => 'Chicken Tikka Masala',
+        'image_url' => 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800',
+        'steps' => "1. Marinate chicken in yogurt, lemon, and spices for 30 minutes\n2. Grill or pan-fry chicken until cooked through\n3. In a separate pan, sauté onions and garlic\n4. Add tomato sauce, cream, and spices\n5. Simmer sauce until thickened\n6. Add cooked chicken to sauce\n7. Serve over basmati rice with naan bread",
+        'ingredients' => [
+            "2 lbs chicken breast, cubed",
+            "1 cup plain yogurt",
+            "1 can tomato sauce",
+            "1 cup heavy cream",
+            "1 large onion, diced",
+            "4 cloves garlic, minced",
+            "2 tbsp garam masala",
+            "1 tbsp turmeric",
+            "1 tsp cumin",
+            "Basmati rice for serving"
+        ]
+    ],
+    [
+        'title' => 'Greek Salad',
+        'image_url' => 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800',
+        'steps' => "1. Chop tomatoes, cucumber, and red onion\n2. Slice kalamata olives in half\n3. Crumble feta cheese\n4. Mix all vegetables in a large bowl\n5. Drizzle with olive oil and red wine vinegar\n6. Add oregano, salt, and pepper\n7. Toss gently and serve chilled",
+        'ingredients' => [
+            "4 large tomatoes, chopped",
+            "1 large cucumber, chopped",
+            "1 red onion, sliced",
+            "1 cup kalamata olives",
+            "8 oz feta cheese",
+            "1/4 cup olive oil",
+            "2 tbsp red wine vinegar",
+            "1 tsp dried oregano",
+            "Salt and pepper to taste"
+        ]
+    ],
+    [
+        'title' => 'Pad Thai',
+        'image_url' => 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800',
+        'steps' => "1. Soak rice noodles in warm water for 30 minutes\n2. Heat oil in a wok or large pan\n3. Scramble eggs and set aside\n4. Cook shrimp until pink\n5. Add noodles, tamarind paste, fish sauce, and sugar\n6. Toss everything together\n7. Add bean sprouts and peanuts\n8. Serve with lime wedges",
+        'ingredients' => [
+            "8 oz rice noodles",
+            "1/2 lb shrimp, peeled",
+            "2 eggs",
+            "3 tbsp tamarind paste",
+            "2 tbsp fish sauce",
+            "2 tbsp brown sugar",
+            "1 cup bean sprouts",
+            "1/4 cup chopped peanuts",
+            "2 green onions, chopped",
+            "Lime wedges for serving"
+        ]
+    ],
+    [
+        'title' => 'Beef Tacos',
+        'image_url' => 'https://images.unsplash.com/photo-1565299585323-38174c3b18c8?w=800',
+        'steps' => "1. Brown ground beef in a large pan\n2. Add taco seasoning and water\n3. Simmer until liquid is absorbed\n4. Warm taco shells in oven\n5. Prepare toppings: lettuce, tomatoes, cheese, sour cream\n6. Fill shells with beef\n7. Top with desired toppings and serve",
+        'ingredients' => [
+            "1 lb ground beef",
+            "1 packet taco seasoning",
+            "8-10 taco shells",
+            "2 cups shredded lettuce",
+            "2 tomatoes, diced",
+            "1 cup shredded cheddar cheese",
+            "1/2 cup sour cream",
+            "Salsa for serving"
+        ]
+    ],
+    [
+        'title' => 'Chocolate Chip Cookies',
+        'image_url' => 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800',
+        'steps' => "1. Cream butter and sugars together\n2. Beat in eggs and vanilla\n3. Mix in flour, baking soda, and salt\n4. Stir in chocolate chips\n5. Drop rounded tablespoons onto baking sheet\n6. Bake at 375°F for 9-11 minutes\n7. Cool on baking sheet for 2 minutes, then transfer",
+        'ingredients' => [
+            "2 1/4 cups all-purpose flour",
+            "1 tsp baking soda",
+            "1 tsp salt",
+            "1 cup butter, softened",
+            "3/4 cup granulated sugar",
+            "3/4 cup brown sugar",
+            "2 large eggs",
+            "2 tsp vanilla extract",
+            "2 cups chocolate chips"
+        ]
+    ]
+];
+
+// Sample pantry items
+$samplePantryItems = [
+    ['ingredient' => 'Chicken Breast', 'quantity' => 2, 'unit' => 'lb'],
+    ['ingredient' => 'Ground Beef', 'quantity' => 1.5, 'unit' => 'lb'],
+    ['ingredient' => 'Spaghetti', 'quantity' => 1, 'unit' => 'lb'],
+    ['ingredient' => 'Tomatoes', 'quantity' => 6, 'unit' => 'piece'],
+    ['ingredient' => 'Onions', 'quantity' => 3, 'unit' => 'piece'],
+    ['ingredient' => 'Garlic', 'quantity' => 1, 'unit' => 'head'],
+    ['ingredient' => 'Olive Oil', 'quantity' => 16, 'unit' => 'oz'],
+    ['ingredient' => 'Parmesan Cheese', 'quantity' => 8, 'unit' => 'oz'],
+    ['ingredient' => 'Eggs', 'quantity' => 12, 'unit' => 'piece'],
+    ['ingredient' => 'Rice', 'quantity' => 2, 'unit' => 'cup'],
+    ['ingredient' => 'Flour', 'quantity' => 5, 'unit' => 'lb'],
+    ['ingredient' => 'Sugar', 'quantity' => 4, 'unit' => 'lb'],
+    ['ingredient' => 'Butter', 'quantity' => 1, 'unit' => 'lb'],
+    ['ingredient' => 'Milk', 'quantity' => 1, 'unit' => 'gallon'],
+    ['ingredient' => 'Salt', 'quantity' => 1, 'unit' => 'lb'],
+    ['ingredient' => 'Black Pepper', 'quantity' => 4, 'unit' => 'oz'],
+    ['ingredient' => 'Cucumber', 'quantity' => 2, 'unit' => 'piece'],
+    ['ingredient' => 'Feta Cheese', 'quantity' => 8, 'unit' => 'oz'],
+    ['ingredient' => 'Lettuce', 'quantity' => 1, 'unit' => 'head'],
+    ['ingredient' => 'Shrimp', 'quantity' => 1, 'unit' => 'lb']
+];
+
+// Clear existing data (optional - comment out if you want to keep existing data)
+echo "<h2>Clearing existing data...</h2>";
+try {
+    $pdo->exec("DELETE FROM recipe_ingredient");
+    $pdo->exec("DELETE FROM recipe");
+    $pdo->exec("DELETE FROM pantry_item");
+    echo "<p class='ok'>[OK] Cleared existing recipes and pantry items</p>";
+} catch (Exception $e) {
+    echo "<p class='error'>[ERROR] " . htmlspecialchars($e->getMessage()) . "</p>";
+}
+
+// Insert sample recipes
+echo "<h2>Inserting Sample Recipes...</h2>";
 $recipeCount = 0;
-$existsStmt = $pdo->prepare('SELECT id FROM recipe WHERE user_id = :uid AND title = :t LIMIT 1');
-
-foreach ($recipes as $title => $data) {
+foreach ($sampleRecipes as $recipe) {
     try {
-         $existsStmt->execute([':uid' => $userId, ':t' => $title]);
-         $existingId = $existsStmt->fetchColumn();
-         
-         $img = $data['image_url'] ?? 'https://picsum.photos/seed/' . rawurlencode(slugify($title)) . '/800/600';
-         
-         if ($existingId) {
-             // Update existing recipe with image
-             $updateStmt = $pdo->prepare('UPDATE recipe SET image_url = :img WHERE id = :id');
-             $updateStmt->execute([':img' => $img, ':id' => $existingId]);
-             echo "<p class='ok'>Updated image for: ".htmlspecialchars($title)." <code>$img</code></p>";
-             continue;
-         }
-
-         $recipeId = repo_save_recipe($userId, [
-             'title'     => $title,
-             'image_url' => $img,
-             'steps'     => $data['steps'],
-         ]);
-        repo_save_recipe_ingredients($recipeId, $data['ingredients']);
-        $recipeCount++;
-        echo "<p class='ok'>Added: ".htmlspecialchars($title)." <code>$img</code></p>";
-    } catch (Throwable $e) {
-        echo "<p class='error'>Error adding ".htmlspecialchars($title).": ".htmlspecialchars($e->getMessage())."</p>";
+        $recipeId = save_recipe($userId, [
+            'title' => $recipe['title'],
+            'image_url' => $recipe['image_url'],
+            'steps' => $recipe['steps']
+        ]);
+        
+        if ($recipeId > 0) {
+            save_recipe_ingredients($recipeId, $recipe['ingredients']);
+            $recipeCount++;
+            echo "<p class='ok'>[OK] Added recipe: " . htmlspecialchars($recipe['title']) . "</p>";
+        }
+    } catch (Exception $e) {
+        echo "<p class='error'>[ERROR] Failed to add " . htmlspecialchars($recipe['title']) . ": " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 }
 
-echo "<h2>Adding Pantry Items</h2>";
+// Insert sample pantry items
+echo "<h2>Inserting Sample Pantry Items...</h2>";
 $pantryCount = 0;
-$existsPantry = $pdo->prepare('SELECT 1 FROM pantry_item WHERE user_id=:uid AND ingredient=:ing LIMIT 1');
-
-foreach ($pantry_items as $item) {
+foreach ($samplePantryItems as $item) {
     try {
-        $existsPantry->execute([':uid'=>$userId, ':ing'=>$item['ingredient']]);
-        if ($existsPantry->fetchColumn()) {
-            echo "<p class='ok'>Skipped (already in pantry): ".htmlspecialchars($item['ingredient'])."</p>";
-            continue;
+        $itemId = add_pantry_item($userId, [
+            'ingredient' => $item['ingredient'],
+            'quantity' => $item['quantity'],
+            'unit' => $item['unit']
+        ]);
+        
+        if ($itemId > 0) {
+            $pantryCount++;
+            echo "<p class='ok'>[OK] Added pantry item: " . htmlspecialchars($item['ingredient']) . "</p>";
         }
-        repo_add_pantry_item($userId, $item);
-        $pantryCount++;
-        echo "<p class='ok'>Added: ".htmlspecialchars($item['quantity'].' '.$item['unit'].' '.$item['ingredient'])."</p>";
-    } catch (Throwable $e) {
-        echo "<p class='error'>Error adding ".htmlspecialchars($item['ingredient']).": ".htmlspecialchars($e->getMessage())."</p>";
+    } catch (Exception $e) {
+        echo "<p class='error'>[ERROR] Failed to add " . htmlspecialchars($item['ingredient']) . ": " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 }
 
 echo "<h2>Summary</h2>";
-echo "<p class='ok'>Added $recipeCount recipes</p>";
-echo "<p class='ok'>Added $pantryCount pantry items</p>";
-
-echo "<h2>Test Your App</h2>";
-$base = dirname($_SERVER['SCRIPT_NAME']);
+echo "<p class='ok'><strong>Successfully added:</strong></p>";
 echo "<ul>";
-echo "<li><a href='{$base}/index.php?action=recipes'>View Recipes</a></li>";
-echo "<li><a href='{$base}/index.php?action=pantry'>View Pantry</a></li>";
-echo "<li><a href='{$base}/index.php?action=match'>Match Recipes</a></li>";
-echo "<li><a href='{$base}/api/recipes.php?q=chicken'>View JSON API</a></li>";
+echo "<li>$recipeCount recipes</li>";
+echo "<li>$pantryCount pantry items</li>";
 echo "</ul>";
 
-echo "<p>Reminder: delete populate_sample_data.php before the demo.</p>";
+echo "<p><a href='index.php'>Go to Home</a> | <a href='index.php?action=recipes'>View Recipes</a> | <a href='index.php?action=pantry'>View Pantry</a></p>";
 echo "</body></html>";
+?>
