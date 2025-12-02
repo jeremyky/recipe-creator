@@ -5,49 +5,49 @@ $recipes = $recipes ?? [];
 ?>
 
 <h1>Cook & History</h1>
-<p class="lead">Start a cooking session and track what you've made.</p>
+<p class="lead">Select a recipe to start a step-by-step cooking session.</p>
 
 <section aria-labelledby="session-heading">
-  <h2 id="session-heading">Start Cooking Session</h2>
+  <h2 id="session-heading">Select Recipe to Cook</h2>
   <?php if (empty($recipes)): ?>
     <div class="card">
       <p>No recipes available. <a href="index.php?action=upload">Upload a recipe</a> to get started!</p>
     </div>
   <?php else: ?>
-    <div class="card">
-      <h3><?= h($recipes[0]['title']) ?></h3>
-      <p class="recipe-meta">
-        Created <?= date('M j, Y', strtotime($recipes[0]['created_at'])) ?> • 
-        <?= intval($recipes[0]['ingredient_count']) ?> ingredients
-      </p>
-      
-      <form method="get" action="#">
-        <fieldset class="form-box">
-          <legend class="form-legend">Preparation checklist</legend>
-          
-          <div class="checkbox-item">
-            <input type="checkbox" id="step1" name="step1">
-            <label for="step1">Read through entire recipe</label>
+    <div class="grid">
+      <?php foreach ($recipes as $recipe): ?>
+        <article class="recipe-card">
+          <div class="recipe-img" role="img" 
+               aria-label="<?= h('Placeholder for ' . $recipe['title']) ?>">
+            <?php if (!empty($recipe['image_url'])): ?>
+              <img src="<?= h($recipe['image_url']) ?>" 
+                   alt="<?= h($recipe['title']) ?>" 
+                   style="width: 100%; height: 100%; object-fit: cover;">
+            <?php else: ?>
+              [Image]
+            <?php endif; ?>
           </div>
-          
-          <div class="checkbox-item">
-            <input type="checkbox" id="step2" name="step2">
-            <label for="step2">Gather all ingredients</label>
+          <div class="recipe-content">
+            <h3 class="recipe-title"><?= h($recipe['title']) ?></h3>
+            <p class="recipe-meta">
+              Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
+              <?= intval($recipe['ingredient_count']) ?> ingredients
+            </p>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+              <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" 
+                 class="btn btn--primary" 
+                 style="flex: 1; text-align: center; text-decoration: none;">
+                Start Cooking
+              </a>
+              <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" 
+                 class="btn" 
+                 style="text-decoration: none;">
+                View Recipe
+              </a>
+            </div>
           </div>
-          
-          <div class="checkbox-item">
-            <input type="checkbox" id="step3" name="step3">
-            <label for="step3">Prepare cooking equipment</label>
-          </div>
-          
-          <div class="checkbox-item">
-            <input type="checkbox" id="step4" name="step4">
-            <label for="step4">Wash and chop vegetables</label>
-          </div>
-        </fieldset>
-        
-        <button type="submit" class="btn btn--primary">Start Cooking</button>
-      </form>
+        </article>
+      <?php endforeach; ?>
     </div>
   <?php endif; ?>
 </section>

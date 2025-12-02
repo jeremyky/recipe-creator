@@ -14,15 +14,24 @@ echo "</head><body><h1>Database Diagnostic Report</h1>";
 
 // Test 1: Database Connection
 echo "<h2>1. Database Connection</h2>";
+require 'lib/db.php';
+
+// Use shared helper (may return null in local dev)
 try {
-    require 'lib/db.php';
     $pdo = db_connect();
-    echo "<p class='ok'>[OK] Database connected successfully</p>";
 } catch (Exception $e) {
-    echo "<p class='error'>[ERROR] Database connection FAILED: " . htmlspecialchars($e->getMessage()) . "</p>";
+    $pdo = null;
+}
+
+if ($pdo === null) {
+    echo "<p class='error'>[ERROR] Database connection FAILED.</p>";
+    echo "<p>This diagnostic script is intended for the cs4640 server where PostgreSQL is running with your course credentials.</p>";
+    echo "<p>On your personal machine, it's normal to see this if Postgres isn't running or isn't configured the same way.</p>";
     echo "</body></html>";
     exit;
 }
+
+echo "<p class='ok'>[OK] Database connected successfully</p>";
 
 // Test 2: Check Required Tables
 echo "<h2>2. Required Tables</h2>";

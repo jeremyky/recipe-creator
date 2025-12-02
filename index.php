@@ -210,9 +210,41 @@ switch ($action) {
         render('match', ['recipes' => $matched_recipes, 'max_missing' => $max_missing]);
         break;
     
+    case 'recipe_detail':
+        $recipeId = intval($_GET['id'] ?? 0);
+        if ($recipeId <= 0) {
+            redirect('index.php?action=recipes');
+        }
+        
+        $recipe = get_recipe($recipeId, user_id());
+        if (!$recipe) {
+            flash('error', 'Recipe not found');
+            redirect('index.php?action=recipes');
+        }
+        
+        $ingredients = get_recipe_ingredients($recipeId);
+        render('recipe_detail', ['recipe' => $recipe, 'ingredients' => $ingredients]);
+        break;
+    
     case 'cook':
         $recipes = get_recipes(user_id());
         render('cook', ['recipes' => $recipes]);
+        break;
+    
+    case 'cook_session':
+        $recipeId = intval($_GET['id'] ?? 0);
+        if ($recipeId <= 0) {
+            redirect('index.php?action=cook');
+        }
+        
+        $recipe = get_recipe($recipeId, user_id());
+        if (!$recipe) {
+            flash('error', 'Recipe not found');
+            redirect('index.php?action=cook');
+        }
+        
+        $ingredients = get_recipe_ingredients($recipeId);
+        render('cook_session', ['recipe' => $recipe, 'ingredients' => $ingredients]);
         break;
     
     case 'chat':

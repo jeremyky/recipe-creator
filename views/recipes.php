@@ -52,25 +52,27 @@ $last_cuisine = $last_cuisine ?? '';
   <?php else: ?>
     <div class="grid">
       <?php foreach ($recipes as $recipe): ?>
-        <article class="recipe-card">
-          <div class="recipe-img" role="img" 
-               aria-label="<?= h('Placeholder for ' . $recipe['title']) ?>">
-            <?php if (!empty($recipe['image_url'])): ?>
-              <img src="<?= h($recipe['image_url']) ?>" 
-                   alt="<?= h($recipe['title']) ?>" 
-                   style="width: 100%; height: 100%; object-fit: cover;">
-            <?php else: ?>
-              [Image]
-            <?php endif; ?>
-          </div>
-          <div class="recipe-content">
-            <h3 class="recipe-title"><?= h($recipe['title']) ?></h3>
-            <p class="recipe-meta">
-              Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
-              <?= intval($recipe['ingredient_count']) ?> ingredients
-            </p>
-          </div>
-        </article>
+        <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" style="text-decoration: none; color: inherit;">
+          <article class="recipe-card">
+            <div class="recipe-img" role="img" 
+                 aria-label="<?= h('Placeholder for ' . $recipe['title']) ?>">
+              <?php if (!empty($recipe['image_url'])): ?>
+                <img src="<?= h($recipe['image_url']) ?>" 
+                     alt="<?= h($recipe['title']) ?>" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+              <?php else: ?>
+                [Image]
+              <?php endif; ?>
+            </div>
+            <div class="recipe-content">
+              <h3 class="recipe-title"><?= h($recipe['title']) ?></h3>
+              <p class="recipe-meta">
+                Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
+                <?= intval($recipe['ingredient_count']) ?> ingredients
+              </p>
+            </div>
+          </article>
+        </a>
       <?php endforeach; ?>
     </div>
   <?php endif; ?>

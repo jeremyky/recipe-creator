@@ -12,15 +12,24 @@ echo "<!DOCTYPE html><html><head><title>Database Init</title>";
 echo "<style>body{font-family:monospace;padding:20px;} .ok{color:green;} .error{color:red;} pre{background:#f5f5f5;padding:10px;}</style>";
 echo "</head><body><h1>Database Initialization</h1>";
 
+require 'lib/db.php';
+
+// Try to connect using shared helper (may return null in local dev)
 try {
-    require 'lib/db.php';
     $pdo = db_connect();
-    echo "<p class='ok'>[OK] Connected to database</p>";
 } catch (Exception $e) {
-    echo "<p class='error'>[ERROR] Cannot connect: " . htmlspecialchars($e->getMessage()) . "</p>";
+    $pdo = null;
+}
+
+if ($pdo === null) {
+    echo "<p class='error'>[ERROR] Cannot connect to database.</p>";
+    echo "<p>This script is meant to run on the cs4640 server where PostgreSQL is available.</p>";
+    echo "<p>On your laptop, it's normal to see this if Postgres isn't running with the same credentials.</p>";
     echo "</body></html>";
     exit;
 }
+
+echo "<p class='ok'>[OK] Connected to database</p>";
 
 $sql_statements = [
     "CREATE TABLE IF NOT EXISTS app_user (
