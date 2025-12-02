@@ -170,6 +170,39 @@ nav a:hover::before {
   width: 60%;
 }
 
+/* Navbar User Section */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.user-greeting {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.btn-logout {
+  padding: 0.5rem 1rem;
+  background: var(--danger);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
 /* ===== TYPOGRAPHY ===== */
 h1 {
   font-size: clamp(2rem, 5vw, 3rem);

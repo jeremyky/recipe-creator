@@ -28,6 +28,12 @@ CS 4640 Sprint 4
         <a href="index.php?action=cook" <?= ($current_page ?? '') === 'cook' ? 'aria-current="page"' : '' ?>>Cook</a>
         <a href="index.php?action=about" <?= ($current_page ?? '') === 'about' ? 'aria-current="page"' : '' ?>>About</a>
       </nav>
+      <div class="navbar-user">
+        <?php if (function_exists('is_authenticated') && is_authenticated()): ?>
+          <?php $user = auth_user(); ?>
+          <span class="user-greeting">👋 <?= h($user['name'] ?? 'User') ?></span>
+          <a href="index.php?action=logout" class="btn btn-logout">Logout</a>
+        <?php endif; ?>
     </div>
   </header>
 

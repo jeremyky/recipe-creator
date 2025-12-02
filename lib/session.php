@@ -10,14 +10,16 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /**
- * Get current user ID from session (or default to 1 for demo)
+ * Get current user ID from session (or default to 1 for demo/development)
  * @return int
  */
 function user_id() {
-    if (!isset($_SESSION['user_id'])) {
-        $_SESSION['user_id'] = 1; // Demo user
+    // Use authenticated user ID if logged in
+    if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
+        return $_SESSION['user_id'];
     }
-    return $_SESSION['user_id'];
+    // For development/testing without authentication
+    return 1; // Demo user
 }
 
 /**

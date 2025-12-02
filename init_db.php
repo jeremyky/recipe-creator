@@ -34,7 +34,9 @@ echo "<p class='ok'>[OK] Connected to database</p>";
 $sql_statements = [
     "CREATE TABLE IF NOT EXISTS app_user (
       id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT 'User',
       email TEXT UNIQUE NOT NULL,
+      password_hash TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     )",
     

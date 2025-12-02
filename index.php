@@ -11,17 +11,127 @@ require __DIR__ . '/lib/util.php';
 require __DIR__ . '/lib/db.php';
 require __DIR__ . '/lib/repo.php';
 require __DIR__ . '/lib/validate.php';
+require __DIR__ . '/lib/auth.php';
 
 // Get action from query string
-$action = $_GET['action'] ?? 'home';
+$action = $_GET['action'] ?? 'landing';
 
 // Route handling
 switch ($action) {
+    // Public landing page
+    case 'landing':
+        if (is_authenticated()) {
+            redirect('index.php?action=home');
+        }
+        include __DIR__ . '/views/landing.php';
+        exit;
+    
+    // Authentication pages
+    case 'login':
+        if (is_authenticated()) {
+            redirect('index.php?action=home');
+        }
+        $flash = get_flash();
+        $old = $_SESSION['old_input'] ?? [];
+        unset($_SESSION['old_input']);
+        include __DIR__ . '/views/login.php';
+        exit;
+    
+    case 'signup':
+        if (is_authenticated()) {
+            redirect('index.php?action=home');
+        }
+        $flash = get_flash();
+        $old = $_SESSION['old_input'] ?? [];
+        unset($_SESSION['old_input']);
+        include __DIR__ . '/views/signup.php';
+        exit;
+    
+    case 'login_submit':
+        require_post();
+        
+        // CSRF check
+        if (!verify_csrf($_POST['csrf'] ?? '')) {
+            flash('error', 'Invalid form submission');
+            redirect('index.php?action=login');
+        }
+        
+        [$errors, $clean] = validate_login($_POST);
+        
+        if (!empty($errors)) {
+            $_SESSION['old_input'] = $_POST;
+            flash('error', $errors[0]);
+            redirect('index.php?action=login');
+        }
+        
+        // Authenticate user
+        $result = authenticate_user($clean['email'], $clean['password']);
+        
+        if (!$result['success']) {
+            $_SESSION['old_input'] = $_POST;
+            flash('error', $result['error']);
+            redirect('index.php?action=login');
+        }
+        
+        // Login user
+        $remember = isset($_POST['remember']) && $_POST['remember'] == '1';
+        login_user($result['user']['id'], $remember);
+        
+        flash('success', 'Welcome back!');
+        
+        // Redirect to intended page or home
+        $redirect_to = $_SESSION['redirect_after_login'] ?? 'index.php?action=home';
+        unset($_SESSION['redirect_after_login']);
+        redirect($redirect_to);
+        break;
+    
+    case 'signup_submit':
+        require_post();
+        
+        // CSRF check
+        if (!verify_csrf($_POST['csrf'] ?? '')) {
+            flash('error', 'Invalid form submission');
+            redirect('index.php?action=signup');
+        }
+        
+        [$errors, $clean] = validate_registration($_POST);
+        
+        if (!empty($errors)) {
+            $_SESSION['old_input'] = $_POST;
+            flash('errors', $errors);
+            redirect('index.php?action=signup');
+        }
+        
+        // Register user
+        $result = register_user($clean['name'], $clean['email'], $clean['password']);
+        
+        if (!$result['success']) {
+            $_SESSION['old_input'] = $_POST;
+            flash('error', $result['error']);
+            redirect('index.php?action=signup');
+        }
+        
+        // Auto-login after registration
+        login_user($result['user_id']);
+        
+        flash('success', 'Account created successfully! Welcome to Recipe Creator!');
+        redirect('index.php?action=home');
+        break;
+    
+    case 'logout':
+        logout_user();
+        flash('success', 'You have been logged out');
+        redirect('index.php?action=landing');
+        break;
+    
+    // Protected app pages (require authentication)
     case 'home':
+        require_auth();
         render('home');
         break;
     
     case 'recipes':
+        require_auth();
         // Handle cuisine filter cookie (state management)
         if (isset($_GET['cuisine'])) {
             setcookie('last_cuisine', $_GET['cuisine'], time() + 60 * 60 * 24 * 30, '/');
@@ -41,12 +151,14 @@ switch ($action) {
         break;
     
     case 'upload':
+        require_auth();
         $flash = get_flash();
         render('upload', ['flash' => $flash, 'old' => $_SESSION['old_input'] ?? []]);
         unset($_SESSION['old_input']);
         break;
     
     case 'upload_submit':
+        require_auth();
         require_post();
         
         // CSRF check
@@ -87,6 +199,7 @@ switch ($action) {
         break;
     
     case 'pantry':
+        require_auth();
         $flash = get_flash();
         $items = get_pantry(user_id());
         render('pantry', ['items' => $items, 'flash' => $flash, 'old' => $_SESSION['old_input'] ?? []]);
@@ -94,6 +207,7 @@ switch ($action) {
         break;
     
     case 'pantry_add':
+        require_auth();
         require_post();
         
         // CSRF check
@@ -120,6 +234,7 @@ switch ($action) {
         break;
     
     case 'pantry_update':
+        require_auth();
         require_post();
         
         // CSRF check
@@ -159,6 +274,7 @@ switch ($action) {
         break;
     
     case 'pantry_delete':
+        require_auth();
         require_post();
         
         $itemId = intval($_POST['item_id'] ?? 0);
@@ -170,6 +286,7 @@ switch ($action) {
         break;
     
     case 'match':
+        require_auth();
         $pantry_items = get_pantry(user_id());
         $pantry_ingredient_names = array_map(function($item) {
             return strtolower(trim($item['ingredient']));
@@ -211,6 +328,7 @@ switch ($action) {
         break;
     
     case 'recipe_detail':
+        require_auth();
         $recipeId = intval($_GET['id'] ?? 0);
         if ($recipeId <= 0) {
             redirect('index.php?action=recipes');
@@ -227,11 +345,13 @@ switch ($action) {
         break;
     
     case 'cook':
+        require_auth();
         $recipes = get_recipes(user_id());
         render('cook', ['recipes' => $recipes]);
         break;
     
     case 'cook_session':
+        require_auth();
         $recipeId = intval($_GET['id'] ?? 0);
         if ($recipeId <= 0) {
             redirect('index.php?action=cook');
@@ -248,6 +368,7 @@ switch ($action) {
         break;
     
     case 'chat':
+        require_auth();
         // Auto-authenticate chat access for this session (password stored server-side only)
         $required_password = $_ENV['CHAT_PASSWORD'] ?? getenv('CHAT_PASSWORD') ?? 'ShaunBoy123';
         if (!isset($_SESSION['chat_authenticated'])) {
@@ -258,6 +379,7 @@ switch ($action) {
         break;
     
     case 'about':
+        require_auth();
         render('about');
         break;
     
