@@ -1,165 +1,173 @@
-# Recipe Creator - Sprint 3
+# Recipe Creator 🍳
 
-**Authors:** Jeremy Ky, Ashley Wu, Shaunak Sinha  
-**Deployed URL:** https://cs4640.cs.virginia.edu/juh7hc/  
-**Course:** CS 4640
+A smart recipe management web app that helps you reduce food waste by matching recipes with your pantry ingredients, featuring AI-powered recipe recommendations and interactive cooking modes.
 
-## Project Structure
+## ✨ Features
+
+- **🤖 AI Chat Assistant** - Get personalized recipe suggestions with OpenAI integration, save recipes with one click
+- **🥘 Smart Recipe Matcher** - Find recipes based on ingredients you already have (0-5 missing ingredients filter)
+- **📦 Pantry Management** - Track your ingredients with quantities and units
+- **📝 Recipe Upload** - Import recipes from URLs or add manually
+- **👨‍🍳 Interactive Cook Mode** - Step-by-step cooking with progress tracking and ingredient checklist
+- **🔍 Live Search** - Real-time recipe filtering with AJAX
+- **🌓 Light/Dark Mode** - Theme toggle with localStorage persistence
+- **🔐 User Authentication** - Email/password + Google OAuth (placeholder)
+- **📱 Responsive Design** - Mobile-friendly CSS Grid layout
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- Vanilla JavaScript (ES6+) with jQuery for AJAX
+- CSS3 with CSS Variables for theming
+- Responsive CSS Grid layout
+- Fetch API for AI chat integration
+
+**Backend:**
+- PHP 8.4+
+- PostgreSQL database
+- Session-based authentication
+- RESTful JSON APIs
+
+**AI Integration:**
+- OpenAI GPT-3.5-turbo
+- Context-aware recipe generation
+- Structured recipe output format
+- Rate limiting (5 requests per 2 minutes)
+
+## 🚀 Quick Start
+
+### Prerequisites
+- PHP 8.4 or higher
+- PostgreSQL (optional for local testing)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd webapp
+   ```
+
+2. **Set up environment variables**
+   Create a `.env` file in the root directory:
+   ```
+   OPENAI_API_KEY=sk-proj-your-key-here
+   ```
+
+3. **Initialize database** (optional - local testing works without DB)
+   ```bash
+   php init_db.php
+   ```
+
+4. **Start local server**
+   ```bash
+   php -S localhost:8888
+   ```
+
+5. **Open in browser**
+   ```
+   http://localhost:8888
+   ```
+
+### Local Testing Mode
+The app automatically uses browser localStorage when database is unavailable, allowing full feature testing without PostgreSQL setup.
+
+## 📖 Usage
+
+1. **Browse Landing Page** - Learn about features and benefits
+2. **Sign In** - Use demo mode for local testing
+3. **Add Pantry Items** - Track your ingredients
+4. **Upload Recipes** - Import or create recipes
+5. **Match Recipes** - Find what you can make with your pantry
+6. **Chat with AI** - Get recipe suggestions and save them instantly
+7. **Start Cooking** - Follow interactive step-by-step instructions
+
+## 🎯 Key JavaScript Features
+
+- **7 Page-Specific Objects** - One per interactive page (HomePageState, RecipeSearch, PantryManager, etc.)
+- **AJAX with jQuery** - Live recipe search and filtering
+- **AJAX with Fetch** - AI chat API integration
+- **Event-Driven Architecture** - DOM manipulation, form validation, dynamic updates
+- **Anonymous Functions** - Error handling, suggestion buttons, recipe parsing
+- **Arrow Functions** - Real-time validation, style updates, callbacks
+- **Client-Side Validation** - Real-time feedback on forms
+- **JSON Consumption** - Recipe data and AI responses
+
+## 🔒 Security Features
+
+- CSRF token protection on all forms
+- Session-based authentication
+- Rate limiting on AI chat (prevents API abuse)
+- Server-side input validation
+- SQL injection prevention (prepared statements)
+- XSS prevention (htmlspecialchars)
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- CSS Grid with auto-responsive columns
+- Collapsible navigation on small screens
+- Touch-friendly button sizes (44px minimum)
+- Optimized for 320px - 1920px+ screens
+
+## 🎨 Design System
+
+- **Color Palette**: Indigo (#6366f1) & Cyan (#06b6d4)
+- **Typography**: System font stack, 16px base
+- **Spacing**: 4, 8, 12, 16, 24, 32, 40px scale
+- **Components**: Unified button system, card patterns, form styles
+- **Animations**: 200-250ms smooth transitions
+
+## 📊 Project Structure
 
 ```
-sprint1/
-├── index.php              # Front controller
-├── schema.sql             # Database schema
-├── lib/                   # PHP library files
+webapp/
+├── api/                    # JSON API endpoints
+│   ├── chat.php           # AI chat with OpenAI
+│   ├── recipes.php        # Recipe data
+│   └── save_ai_recipe.php # Save AI-generated recipes
+├── assets/
+│   ├── js/                # Page-specific JavaScript objects
+│   │   ├── home.js       # HomePageState
+│   │   ├── recipes.js    # RecipeSearch (jQuery + AJAX)
+│   │   ├── chat.js       # ChatInterface (Fetch API)
+│   │   ├── pantry.js     # PantryManager
+│   │   ├── upload.js     # UploadFormValidator
+│   │   ├── match.js      # MatchManager
+│   │   └── cook.js       # CookingSession
+│   ├── styles.css        # Main app styles (1700+ lines)
+│   ├── landing.css       # Landing page styles
+│   └── auth.css          # Authentication styles
+├── lib/                   # Backend utilities
+│   ├── auth.php          # Authentication logic
 │   ├── db.php            # Database connection
-│   ├── session.php       # Session management
-│   ├── util.php          # Utility functions
-│   ├── validate.php      # Validation with regex
-│   └── repo.php          # Database repository functions
-├── views/                 # View templates
-│   ├── layout.header.php
-│   ├── layout.footer.php
-│   ├── home.php
-│   ├── recipes.php
-│   ├── upload.php
-│   ├── pantry.php
-│   ├── match.php
-│   ├── cook.php
-│   └── chat.php
-├── api/                   # JSON API endpoints
-│   └── recipes.php       # GET /api/recipes.php?q=chicken
-└── assets/               # Static assets
-    ├── styles.css
-    └── uva.jpg
+│   ├── repo.php          # Data access functions
+│   └── validate.php      # Input validation
+├── views/                # PHP templates
+│   ├── landing.php       # Public landing page
+│   ├── home.php          # Dashboard
+│   ├── recipes.php       # Recipe browsing
+│   ├── chat.php          # AI assistant
+│   └── ...
+├── index.php             # Front controller & routing
+└── init_db.php           # Database initialization
 ```
 
-## Deployment Instructions
+## 🤝 Authors
 
-1. **Upload files to server:**
-   ```bash
-   # Upload all files to ~/public_html/recipe-creator/
-   ```
+- Jeremy Ky
+- Ashley Wu
+- Shaunak Sinha
 
-2. **Create database and run schema:**
-   ```bash
-   # Connect to Postgres (via phpPgAdmin or psql)
-   psql -U juh7hc -d juh7hc
-   
-   # Run schema.sql
-   \i schema.sql
-   ```
+**Course:** CS 4640 - Web Application Development  
+**Institution:** University of Virginia  
 
-3. **Set database environment variables (if needed):**
-   - The code uses environment variables for DB connection
-   - Defaults work with standard cs4640 server setup
+## 🌟 Highlights
 
-4. **Set permissions:**
-   ```bash
-   chmod 644 *.php
-   chmod 755 lib/ views/ api/
-   ```
-
-## Features Implemented
-
-### Requirements Checklist
-
-**Front Controller Pattern** - All routes handled via `index.php?action=...`
-
-**Arrays & Control Structures**
-- Arrays: Used throughout (user data, recipe lists, pantry items)
-- Loops: `foreach` in views and repository functions
-- Selection: `switch` in front controller, `if/else` throughout
-
-**Built-in Functions**
-- `trim()`, `explode()`, `array_map()`, `preg_match()`, `json_encode()`, etc.
-
-**User-defined Functions** (11 total)
-- `db_connect()` - Database connection
-- `user_id()` - Get current user
-- `flash()` / `get_flash()` - Flash messages
-- `csrf_token()` / `verify_csrf()` - CSRF protection
-- `render()` - View rendering
-- `json_out()` - JSON response
-- `validate_recipe()` - Recipe validation
-- `validate_pantry()` - Pantry validation
-- `get_recipes()`, `save_recipe()`, `add_pantry_item()`, etc. - Repository functions
-
-**$_GET & $_POST**
-- GET: Search, filters, pagination (recipes, match)
-- POST: Form submissions (upload, pantry add/delete)
-
-**Server-side Validation**
-- Two regex patterns:
-  1. URL validation: `/^https?:\/\/[^\s]+$/i`
-  2. Ingredient validation: `/^\s*([A-Za-z][A-Za-z\s\-]+|\d+(\.\d+)?\s?[A-Za-z]+.*)\s*$/`
-- Error messages displayed to users
-- Form values preserved on validation errors
-
-**Form Submission & Handling**
-- Upload recipe form (manual & URL)
-- Pantry add/delete forms
-- CSRF protection on all forms
-- Flash messages for success/errors
-
-**$_SESSION**
-- User ID stored in session
-- Flash messages
-- CSRF tokens
-- Old form input preservation
-
-**State Management**
-- **Cookies**: Last selected cuisine filter (`last_cuisine`)
-- **Hidden Fields**: CSRF tokens in all forms
-- **URL Rewriting**: Search params, pagination (in JSON API)
-
-**Database (Postgres)**
-- **Retrieve**: Users can view their recipes and pantry items
-- **Add**: Upload recipes, add pantry items
-- **Update**: (Structure ready, can be extended)
-- **Delete**: Remove pantry items
-- Multiple sessions supported via user_id
-
-**JSON Endpoint**
-- `/api/recipes.php?q=chicken&cuisine=italian&page=1`
-- Returns paginated recipe results in JSON format
-
-**Code Style**
-- Consistent indentation (2 spaces)
-- Meaningful variable/function names
-- Comments throughout
-- Newlines in output
-
-## Testing the Application
-
-1. **Add to Pantry:**
-   - Navigate to Pantry page
-   - Fill form and submit
-   - Try invalid input to see validation
-
-2. **Upload Recipe:**
-   - Navigate to Upload page
-   - Fill manual form or URL form
-   - Check validation errors
-
-3. **View Recipes:**
-   - Browse recipes page
-   - Use search and filter
-   - Check cookie persistence (refresh, cuisine should be remembered)
-
-4. **Match Recipes:**
-   - Add items to pantry first
-   - Go to Match page
-   - Adjust slider and see matched recipes
-
-5. **JSON API:**
-   - Visit: `api/recipes.php?q=chicken`
-   - Should return JSON with recipe data
-
-## Database Schema
-
-See `schema.sql` for complete schema. Main tables:
-- `app_user` - Users
-- `recipe` - Recipes
-- `pantry_item` - User pantry items
-- `recipe_ingredient` - Recipe ingredients (many-to-many)
+- **Context-Aware AI** - Knows your pantry and recipes
+- **One-Click Recipe Save** - AI recipes → Collection instantly
+- **Smart Ingredient Matching** - Minimizes food waste
+- **Interactive Cooking** - Real-time progress tracking
+- **Fallback Support** - Works offline with localStorage
+- **Professional UI** - Modern design with smooth animations
 
