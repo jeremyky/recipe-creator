@@ -1,0 +1,238 @@
+/**
+ * Blog article page styles
+ * Authors: Jeremy Ky, Ashley Wu, Shaunak Sinha
+ * CS 4640 Sprint 4
+ */
+
+/* Article Layout */
+.blog-article {
+  background-color: var(--bg-primary);
+  min-height: 100vh;
+}
+
+.article-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 4rem 0 3rem;
+  color: white;
+  text-align: center;
+}
+
+.article-tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.article-tag.ai {
+  background: rgba(139, 92, 246, 0.3);
+}
+
+.article-tag.sustainability {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+.article-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.article-meta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.938rem;
+  opacity: 0.9;
+  flex-wrap: wrap;
+}
+
+/* Article Content */
+.article-content {
+  padding: 3rem 0;
+}
+
+.article-content .container {
+  max-width: 800px;
+}
+
+.article-hero-image {
+  font-size: 6rem;
+  text-align: center;
+  margin: 2rem 0 3rem;
+}
+
+.article-content .lead {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+}
+
+.article-content h2 {
+  font-size: 1.875rem;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.article-content h3 {
+  font-size: 1.375rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.article-content p {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  font-size: 1.063rem;
+}
+
+.article-content ul,
+.article-content ol {
+  margin-bottom: 1.5rem;
+  padding-left: 2rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.article-content li {
+  margin-bottom: 0.75rem;
+}
+
+.article-content strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Callout Boxes */
+.article-callout {
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--primary);
+  padding: 1.5rem 2rem;
+  margin: 2.5rem 0;
+  border-radius: 8px;
+}
+
+.article-callout h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.article-callout p {
+  margin-bottom: 1rem;
+}
+
+.article-callout p:last-child {
+  margin-bottom: 0;
+}
+
+.article-callout ul {
+  margin-bottom: 0;
+}
+
+/* CTA Section */
+.article-cta {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 3rem;
+  border-radius: 16px;
+  text-align: center;
+  margin: 4rem 0 2rem;
+}
+
+.article-cta h3 {
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.article-cta p {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  color: white;
+}
+
+/* Footer */
+.blog-footer {
+  background-color: var(--bg-secondary);
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.blog-footer a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.blog-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .article-header {
+    padding: 3rem 0 2rem;
+  }
+  
+  .article-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .article-hero-image {
+    font-size: 4rem;
+    margin: 1.5rem 0 2rem;
+  }
+  
+  .article-content {
+    padding: 2rem 0;
+  }
+  
+  .article-content .lead {
+    font-size: 1.125rem;
+  }
+  
+  .article-content h2 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .article-content h3 {
+    font-size: 1.25rem;
+  }
+  
+  .article-content p {
+    font-size: 1rem;
+  }
+  
+  .article-callout {
+    padding: 1rem 1.5rem;
+  }
+  
+  .article-cta {
+    padding: 2rem 1.5rem;
+  }
+  
+  .article-cta h3 {
+    font-size: 1.5rem;
+  }
+}
+

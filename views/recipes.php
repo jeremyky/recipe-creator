@@ -5,20 +5,22 @@ $recipes = $recipes ?? [];
 $last_cuisine = $last_cuisine ?? '';
 ?>
 
-<h1>Browse Recipes</h1>
-<p class="lead">Filter by cuisine, search by name, or explore our full collection.</p>
+<div class="section-header">
+  <h1>Browse Recipes</h1>
+  <p>Discover recipes by cuisine, search by name, or explore our collection</p>
+</div>
 
 <section aria-labelledby="filters-heading">
   <h2 class="sr-only" id="filters-heading">Filter recipes</h2>
-  <div class="card m-b-1-5">
-    <form method="get" action="index.php">
+  <div class="card">
+    <form method="get" action="index.php" style="display: flex; flex-direction: column; gap: var(--space-l);">
       <input type="hidden" name="action" value="recipes">
-      <div class="form-row">
+      <div style="display: grid; grid-template-columns: 1fr 200px auto; gap: var(--space-l); align-items: end;">
         <div>
           <label for="search-recipes">Search recipes</label>
           <input type="search" id="search-recipes" name="search" 
                  value="<?= h($_GET['search'] ?? '') ?>" 
-                 placeholder="pasta, chicken, etc">
+                 placeholder="pasta, chicken, curry...">
         </div>
         <div>
           <label for="cuisine-filter">Cuisine</label>
@@ -35,44 +37,43 @@ $last_cuisine = $last_cuisine ?? '';
             <?php endforeach; ?>
           </select>
         </div>
-        <div style="display: flex; align-items: flex-end;">
-          <button type="submit" class="btn btn--primary">Filter</button>
-        </div>
+        <button type="submit" class="btn-primary">Search</button>
       </div>
     </form>
   </div>
 </section>
 
 <section aria-labelledby="results-heading">
-  <h2 id="results-heading">All Recipes</h2>
+  <div class="section-header">
+    <h2 id="results-heading">All Recipes</h2>
+    <p class="text-muted"><?= count($recipes) ?> recipe<?= count($recipes) !== 1 ? 's' : '' ?> found</p>
+  </div>
   <?php if (empty($recipes)): ?>
     <div class="card">
       <p>No recipes found. <a href="index.php?action=upload">Upload a recipe</a> to get started!</p>
     </div>
   <?php else: ?>
-    <div class="grid">
+    <div class="grid grid-3">
       <?php foreach ($recipes as $recipe): ?>
-        <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" style="text-decoration: none; color: inherit;">
-          <article class="recipe-card">
-            <div class="recipe-img" role="img" 
-                 aria-label="<?= h('Placeholder for ' . $recipe['title']) ?>">
+        <article class="card recipe-card">
+          <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
+            <div class="card-image recipe-img">
               <?php if (!empty($recipe['image_url'])): ?>
                 <img src="<?= h($recipe['image_url']) ?>" 
-                     alt="<?= h($recipe['title']) ?>" 
-                     style="width: 100%; height: 100%; object-fit: cover;">
+                     alt="<?= h($recipe['title']) ?>">
               <?php else: ?>
-                [Image]
+                <span style="font-size: 64px; opacity: 0.3;">🍳</span>
               <?php endif; ?>
             </div>
-            <div class="recipe-content">
-              <h3 class="recipe-title"><?= h($recipe['title']) ?></h3>
-              <p class="recipe-meta">
-                Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
-                <?= intval($recipe['ingredient_count']) ?> ingredients
+            <div class="card-header">
+              <h3><?= h($recipe['title']) ?></h3>
+              <p class="text-small">
+                <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
+                <span class="chip chip-primary" style="margin-left: 8px;"><?= intval($recipe['ingredient_count']) ?> ingredients</span>
               </p>
             </div>
-          </article>
-        </a>
+          </a>
+        </article>
       <?php endforeach; ?>
     </div>
   <?php endif; ?>

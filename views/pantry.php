@@ -6,11 +6,15 @@ $old = $old ?? [];
 $errors = $flash['errors'] ?? [];
 ?>
 
-<h1>My Pantry</h1>
-<p class="lead">Keep track of ingredients you have at home.</p>
+<div class="section-header">
+  <h1>My Pantry</h1>
+  <p>Keep track of ingredients you have at home</p>
+</div>
 
 <section aria-labelledby="add-heading">
-  <h2 id="add-heading">Add Ingredient</h2>
+  <div class="section-header">
+    <h2 id="add-heading">Add Ingredient</h2>
+  </div>
   <div class="card">
     <?php if (!empty($errors)): ?>
       <div style="background: var(--danger); color: white; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
@@ -61,13 +65,16 @@ $errors = $flash['errors'] ?? [];
           </select>
         </div>
       </div>
-      <button type="submit" class="btn btn--primary">Add to Pantry</button>
+      <button type="submit" class="btn-primary">Add to Pantry</button>
     </form>
   </div>
 </section>
 
 <section aria-labelledby="list-heading">
-  <h2 id="list-heading">Current Inventory</h2>
+  <div class="section-header">
+    <h2 id="list-heading">Current Inventory</h2>
+    <p class="text-muted"><?= count($items) ?> item<?= count($items) !== 1 ? 's' : '' ?> in pantry</p>
+  </div>
   <div class="card">
     <?php if (empty($items)): ?>
       <p>Your pantry is empty. Add some ingredients to get started!</p>

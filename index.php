@@ -26,6 +26,19 @@ switch ($action) {
         include __DIR__ . '/views/landing.php';
         exit;
     
+    // Blog articles (public)
+    case 'blog_pantry':
+        include __DIR__ . '/views/blog_pantry.php';
+        exit;
+    
+    case 'blog_ai':
+        include __DIR__ . '/views/blog_ai.php';
+        exit;
+    
+    case 'blog_waste':
+        include __DIR__ . '/views/blog_waste.php';
+        exit;
+    
     // Authentication pages
     case 'login':
         if (is_authenticated()) {

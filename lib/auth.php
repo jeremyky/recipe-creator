@@ -16,6 +16,17 @@ function is_authenticated() {
  * Require authentication (redirect to login if not authenticated)
  */
 function require_auth() {
+    // For local development without database - auto-login as demo user
+    if ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_NAME'] === '127.0.0.1') {
+        if (!is_authenticated()) {
+            $_SESSION['user_id'] = 1; // Demo user
+            $_SESSION['user_name'] = 'Demo User';
+            $_SESSION['logged_in_at'] = time();
+        }
+        return;
+    }
+    
+    // Normal authentication check
     if (!is_authenticated()) {
         $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
         redirect('index.php?action=login');
@@ -38,6 +49,17 @@ function auth_user() {
     }
     
     $user_id = auth_user_id();
+    
+    // For local development without database
+    if ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_NAME'] === '127.0.0.1') {
+        return [
+            'id' => 1,
+            'name' => $_SESSION['user_name'] ?? 'Demo User',
+            'email' => 'demo@example.com',
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+    }
+    
     $pdo = db_connect();
     
     if (!$pdo) return null;

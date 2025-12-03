@@ -5,22 +5,22 @@ $recipe = $recipe ?? [];
 $ingredients = $ingredients ?? [];
 ?>
 
-<div style="margin-bottom: 1rem;">
-  <a href="index.php?action=cook" style="color: var(--accent); text-decoration: none;">
-    ← Back to Cook
+<div style="margin-bottom: var(--space-xl);">
+  <a href="index.php?action=cook" class="btn-ghost" style="padding: var(--space-s) var(--space-l);">
+    ← Back to Recipes
   </a>
 </div>
 
 <article class="cooking-session">
-  <header class="session-header card" style="margin-bottom: 2rem;">
-    <h1>Cooking: <?= h($recipe['title']) ?></h1>
-    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-      Follow along step-by-step. Check off each step as you complete it.
-    </p>
-    <div id="progress-bar" style="background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 1rem;">
-      <div id="progress-fill" style="background: var(--accent); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+  <header class="session-header card">
+    <div class="section-header" style="margin-bottom: var(--space-l);">
+      <h1><?= h($recipe['title']) ?></h1>
+      <p>Follow along step-by-step and check off each step as you complete it</p>
     </div>
-    <p id="progress-text" style="color: var(--muted); font-size: 0.9rem;">0% complete</p>
+    <div id="progress-bar" style="background: var(--color-bg); height: 12px; border-radius: var(--radius-s); overflow: hidden; margin-bottom: var(--space-m); border: 1px solid var(--color-border-subtle);">
+      <div id="progress-fill" style="background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+    </div>
+    <p id="progress-text" class="text-muted" style="font-size: 14px; font-weight: 600;">0% complete</p>
   </header>
 
   <div class="session-content">

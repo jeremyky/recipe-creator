@@ -5,28 +5,37 @@ $recipes = $recipes ?? [];
 $max_missing = $max_missing ?? 3;
 ?>
 
-<h1>Match from Fridge</h1>
-<p class="lead">Find recipes based on ingredients you already have.</p>
+<div class="section-header">
+  <h1>Recipe Matcher</h1>
+  <p>Find recipes based on ingredients you already have</p>
+</div>
 
 <section aria-labelledby="filter-heading">
   <h2 class="sr-only" id="filter-heading">Filter options</h2>
-  <div class="card m-b-1-5">
+  <div class="card">
     <form method="get" action="index.php">
       <input type="hidden" name="action" value="match">
-      <div class="form-row">
-        <label for="max-missing">Maximum missing ingredients: <output id="max-missing-value"><?= h($max_missing) ?></output></label>
+      <div style="margin-bottom: var(--space-xl);">
+        <label for="max-missing" style="display: block; margin-bottom: var(--space-l);">
+          Maximum missing ingredients: 
+          <span class="chip chip-primary" id="max-missing-value"><?= h($max_missing) ?></span>
+        </label>
         <input type="range" id="max-missing" name="max-missing" min="0" max="5" 
                value="<?= h($max_missing) ?>" step="1" 
                oninput="document.getElementById('max-missing-value').textContent = this.value"
-               aria-valuenow="<?= h($max_missing) ?>">
+               aria-valuenow="<?= h($max_missing) ?>"
+               style="width: 100%;">
       </div>
-      <button type="submit" class="btn btn--primary">Find Matches</button>
+      <button type="submit" class="btn-primary">Find Matches</button>
     </form>
   </div>
 </section>
 
 <section aria-labelledby="matches-heading">
-  <h2 id="matches-heading">Recipe Matches</h2>
+  <div class="section-header">
+    <h2 id="matches-heading">Recipe Matches</h2>
+    <p class="text-muted"><?= count($recipes) ?> recipe<?= count($recipes) !== 1 ? 's' : '' ?> found</p>
+  </div>
   <?php if (empty($recipes)): ?>
     <div class="card">
       <p>No matching recipes found. Try adjusting the maximum missing ingredients or <a href="index.php?action=pantry">add more ingredients to your pantry</a>.</p>

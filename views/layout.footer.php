@@ -46,6 +46,9 @@
             crossorigin="anonymous"></script>
   <?php endif; ?>
 
+  <!-- Theme toggle (load first) -->
+  <script src="assets/js/theme.js"></script>
+  
   <!-- Page-specific JavaScript -->
   <?php
   $js_file = 'assets/js/' . ($current_page ?? 'home') . '.js';

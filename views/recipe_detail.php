@@ -5,29 +5,31 @@ $recipe = $recipe ?? [];
 $ingredients = $ingredients ?? [];
 ?>
 
-<div style="margin-bottom: 1rem;">
-  <a href="index.php?action=recipes" style="color: var(--accent); text-decoration: none;">
+<div style="margin-bottom: var(--space-xl);">
+  <a href="index.php?action=recipes" class="btn-ghost" style="padding: var(--space-s) var(--space-l);">
     ← Back to Recipes
   </a>
 </div>
 
 <article class="recipe-detail">
-  <header class="recipe-header">
+  <header class="recipe-header card">
     <?php if (!empty($recipe['image_url'])): ?>
-      <div class="recipe-hero-img">
+      <div class="card-image" style="margin: calc(var(--space-xl) * -1) calc(var(--space-xl) * -1) var(--space-xl);">
         <img src="<?= h($recipe['image_url']) ?>" alt="<?= h($recipe['title']) ?>">
       </div>
     <?php endif; ?>
     
-    <h1><?= h($recipe['title']) ?></h1>
-    <p class="recipe-meta" style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-      Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
-      <?= count($ingredients) ?> ingredients
-    </p>
+    <div class="section-header">
+      <h1><?= h($recipe['title']) ?></h1>
+      <p>
+        Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
+        <span class="chip chip-primary"><?= count($ingredients) ?> ingredients</span>
+      </p>
+    </div>
     
-    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-      <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" class="btn btn--primary">
-        Start Cooking Session
+    <div style="display: flex; gap: var(--space-m); margin-top: var(--space-xl);">
+      <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" class="btn-primary">
+        Start Cooking
       </a>
     </div>
   </header>

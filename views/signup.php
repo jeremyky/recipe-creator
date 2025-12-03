@@ -121,6 +121,14 @@ if (!function_exists('csrf_token')) {
         <button type="submit" class="btn btn-primary btn-full">Create Account</button>
       </form>
       
+      <?php if ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_NAME'] === '127.0.0.1'): ?>
+      <div style="margin-top: 1.5rem; padding: 1rem; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; text-align: center;">
+        <p style="margin: 0 0 0.5rem; font-weight: 600; color: #1e40af;">🔧 Local Testing Mode</p>
+        <p style="margin: 0 0 1rem; font-size: 0.875rem; color: #1e40af;">Database not required for local testing</p>
+        <a href="index.php?action=home" class="btn btn-primary" style="display: inline-block;">Continue to App (Demo Mode)</a>
+      </div>
+      <?php endif; ?>
+      
       <div class="auth-footer">
         <p>Already have an account? <a href="index.php?action=login">Sign in</a></p>
       </div>

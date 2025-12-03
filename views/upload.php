@@ -5,8 +5,10 @@ $old = $old ?? [];
 $errors = $flash['errors'] ?? [];
 ?>
 
-<h1>Upload Recipe</h1>
-<p class="lead">Add recipes from a URL or enter them manually.</p>
+<div class="section-header">
+  <h1>Upload Recipe</h1>
+  <p>Add recipes from a URL or enter them manually</p>
+</div>
 
 <?php if (!empty($errors)): ?>
   <div class="card" style="background: var(--danger); color: white; margin-bottom: 1rem;">

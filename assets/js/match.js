@@ -22,25 +22,86 @@ const MatchManager = {
         
         if (!slider || !output) return;
         
-        // Event listener for slider input
+        // Store the original step value
+        const originalStep = slider.getAttribute('step') || '1';
+        
+        // Initialize gradient
+        const initValue = parseInt(slider.value);
+        const initPercentage = (initValue / 5) * 100;
+        slider.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${initPercentage}%, var(--color-border-subtle) ${initPercentage}%, var(--color-border-subtle) 100%)`;
+        
+        // Remove step to allow smooth dragging
+        let isDragging = false;
+        
+        // Mouse/touch down - start dragging
+        slider.addEventListener('mousedown', () => {
+            isDragging = true;
+            slider.setAttribute('step', '0.01'); // Allow smooth sliding
+        });
+        
+        slider.addEventListener('touchstart', () => {
+            isDragging = true;
+            slider.setAttribute('step', '0.01'); // Allow smooth sliding
+        });
+        
+        // Event listener for slider input (smooth dragging)
         slider.addEventListener('input', (event) => {
-            const value = parseInt(event.target.value);
-            this.maxMissing = value;
+            const value = parseFloat(event.target.value);
+            const displayValue = Math.round(value);
             
             // DOM manipulation - update output display
-            output.textContent = value;
+            output.textContent = displayValue;
             
             // Modify style based on value using arrow function
             const updateSliderStyle = (val) => {
                 const percentage = (val / 5) * 100;
-                slider.style.background = `linear-gradient(to right, var(--primary, #0066cc) 0%, var(--primary, #0066cc) ${percentage}%, #ddd ${percentage}%, #ddd 100%)`;
+                slider.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${percentage}%, var(--color-border-subtle) ${percentage}%, var(--color-border-subtle) 100%)`;
             };
             
             updateSliderStyle(value);
             
             // Highlight matching recipes dynamically
-            this.highlightMatchingRecipes(value);
+            this.highlightMatchingRecipes(displayValue);
         });
+        
+        // Function to snap to nearest integer
+        const snapToInteger = () => {
+            if (isDragging) {
+                isDragging = false;
+                
+                const value = parseFloat(slider.value);
+                const snappedValue = Math.round(value);
+                
+                // Snap to nearest integer
+                slider.value = snappedValue;
+                slider.setAttribute('step', originalStep); // Restore original step
+                this.maxMissing = snappedValue;
+                
+                // Update display
+                output.textContent = snappedValue;
+                
+                // Update style for snapped value
+                const percentage = (snappedValue / 5) * 100;
+                slider.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${percentage}%, var(--color-border-subtle) ${percentage}%, var(--color-border-subtle) 100%)`;
+                
+                // Final highlight update
+                this.highlightMatchingRecipes(snappedValue);
+            }
+        };
+        
+        // Mouse/touch up - snap to integer
+        slider.addEventListener('mouseup', snapToInteger);
+        slider.addEventListener('touchend', snapToInteger);
+        
+        // Also handle when mouse leaves the slider while dragging
+        slider.addEventListener('mouseleave', () => {
+            if (isDragging) {
+                snapToInteger();
+            }
+        });
+        
+        // Handle change event as fallback
+        slider.addEventListener('change', snapToInteger);
     },
     
     // Highlight recipes based on missing ingredient count

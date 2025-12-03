@@ -11,6 +11,14 @@ CS 4640 Sprint 4
   <meta name="author" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
   <title><?= h($page_title ?? 'Recipe Creator') ?></title>
   <link rel="stylesheet" href="assets/styles.css">
+  <script>
+    // Set initial theme before page loads to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('app-theme') || 'dark';
+      const themeClass = savedTheme === 'light' ? 'light-mode' : 'dark-mode';
+      document.documentElement.className = themeClass;
+    })();
+  </script>
 </head>
 <body>
   <a href="#main" class="sr-only">Skip to main content</a>
@@ -28,6 +36,9 @@ CS 4640 Sprint 4
         <a href="index.php?action=cook" <?= ($current_page ?? '') === 'cook' ? 'aria-current="page"' : '' ?>>Cook</a>
         <a href="index.php?action=about" <?= ($current_page ?? '') === 'about' ? 'aria-current="page"' : '' ?>>About</a>
       </nav>
+      <button id="app-theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle light/dark mode">
+        <span class="theme-icon">🌙</span>
+      </button>
       <div class="navbar-user">
         <?php if (function_exists('is_authenticated') && is_authenticated()): ?>
           <?php $user = auth_user(); ?>
@@ -51,6 +62,6 @@ CS 4640 Sprint 4
     <?php endif; ?>
 
     <div class="hero-logo">
-      <img src="assets/uva.jpg" alt="University of Virginia logo">
+      <span style="font-size: 80px;">🍳</span>
     </div>
 

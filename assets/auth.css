@@ -175,16 +175,33 @@ body {
   font-size: 1rem;
   transition: all 0.2s ease;
   background: white;
+  color: #111827;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  color: #111827;
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
 }
 
 .form-group input.error {
   border-color: #ef4444;
+  color: #111827;
+}
+
+/* Fix autocomplete styling */
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #111827;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .password-strength {

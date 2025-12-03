@@ -207,7 +207,7 @@
             <span class="blog-tag">Getting Started</span>
             <h3>10 Tips to Maximize Your Pantry Efficiency</h3>
             <p>Ever opened your pantry only to discover expired items hiding in the back? You're not alone. A well-organized pantry isn't just aesthetically pleasing—it's a money-saver and time-saver. Start by categorizing items by type (grains, canned goods, spices) and using clear containers so you can see what you have at a glance. Place newer items behind older ones (first-in, first-out method) and keep a running inventory list on your phone. Consider adding shelf risers to maximize vertical space and lazy Susans for corner cabinets. Label everything with purchase or expiration dates, and do a monthly audit to move soon-to-expire items to the front. With Recipe Creator's smart pantry tracking, you'll get automatic reminders when items are running low, helping you avoid both waste and last-minute grocery runs. Remember: a visible pantry is a usable pantry!</p>
-            <a href="#blog-pantry" class="blog-link">Read More →</a>
+            <a href="index.php?action=blog_pantry" class="blog-link">Read More →</a>
           </div>
         </article>
         
@@ -219,7 +219,7 @@
             <span class="blog-tag">AI Features</span>
             <h3>How to Get Better AI Recipe Recommendations</h3>
             <p>Getting generic recipe suggestions? Let's change that. Our AI learns from your behavior, but you can accelerate the process. Start by rating recipes honestly—the AI uses this feedback to understand your taste preferences. Use specific search terms like "quick weeknight dinner" or "vegetarian comfort food" instead of just "pasta." Update your pantry regularly so the AI knows what you actually have available. Tag recipes with custom labels like "family favorite" or "date night" to help the system understand context. The chat feature is incredibly powerful—don't just ask "what should I make?" Try: "I have 30 minutes, chicken thighs, and I'm craving something spicy." The more detailed your inputs, the more personalized your results. Also, explore the "surprise me" feature when you're feeling adventurous—it helps the AI discover patterns you might not even know about yourself!</p>
-            <a href="#blog-ai" class="blog-link">Read More →</a>
+            <a href="index.php?action=blog_ai" class="blog-link">Read More →</a>
           </div>
         </article>
         
@@ -231,7 +231,7 @@
             <span class="blog-tag">Sustainability</span>
             <h3>Reducing Food Waste: A Complete Guide</h3>
             <p>Did you know that the average household throws away $1,500 worth of food each year? Food waste isn't just an environmental issue—it's draining your wallet. The solution starts with mindful shopping: always check your pantry before heading to the store (Recipe Creator makes this easy with our mobile-friendly pantry view). Buy only what you need and plan meals around ingredients you already have. Master the art of "rescue cooking"—that slightly wilted spinach? Perfect for a frittata. Overripe bananas? Banana bread time. Leftover rice? Fried rice tomorrow. Store produce properly: keep herbs in water like flowers, wrap leafy greens in damp towels, and never store tomatoes in the fridge. Freeze what you can't use immediately—bread, stock, even cheese can be frozen. Use Recipe Creator's expiration tracking to get alerted before items go bad, and try our "use it up" feature to find recipes specifically designed to rescue ingredients. Every meal you make from what you have is a small victory for your budget and the planet.</p>
-            <a href="#blog-waste" class="blog-link">Read More →</a>
+            <a href="index.php?action=blog_waste" class="blog-link">Read More →</a>
           </div>
         </article>
       </div>

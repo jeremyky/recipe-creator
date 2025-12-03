@@ -4,11 +4,16 @@ $current_page = 'cook';
 $recipes = $recipes ?? [];
 ?>
 
-<h1>Cook & History</h1>
-<p class="lead">Select a recipe to start a step-by-step cooking session.</p>
+<div class="section-header">
+  <h1>Start Cooking</h1>
+  <p>Select a recipe to start a step-by-step cooking session</p>
+</div>
 
 <section aria-labelledby="session-heading">
-  <h2 id="session-heading">Select Recipe to Cook</h2>
+  <div class="section-header">
+    <h2 id="session-heading">Available Recipes</h2>
+    <p class="text-muted">Choose a recipe to begin</p>
+  </div>
   <?php if (empty($recipes)): ?>
     <div class="card">
       <p>No recipes available. <a href="index.php?action=upload">Upload a recipe</a> to get started!</p>
