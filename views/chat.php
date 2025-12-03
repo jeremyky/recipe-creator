@@ -6,23 +6,26 @@ $current_page = 'chat';
 <div class="section-header">
   <h1>AI Cooking Assistant</h1>
   <p>Get personalized recipe recommendations and cooking tips</p>
+  <p class="text-small" style="opacity: 0.6; margin-top: 8px;">
+    ℹ️ Rate limit: 5 messages per 2 minutes • AI has access to your pantry and recipes
+  </p>
 </div>
 
 <!-- Chat Container -->
 <div class="chat-container">
   <!-- Suggestions -->
   <div class="chat-suggestions" id="chat-suggestions">
-    <button type="button" class="chip" data-prompt="What can I make with chicken and rice?">
-      What can I make with chicken and rice?
+    <button type="button" class="chip" data-prompt="Give me a chicken dinner recipe I can save">
+      💾 Get a saveable recipe
+    </button>
+    <button type="button" class="chip" data-prompt="What can I make with my pantry ingredients?">
+      🥘 Use my pantry
     </button>
     <button type="button" class="chip" data-prompt="Give me a quick 30-minute dinner recipe">
-      Quick 30-minute dinner
-    </button>
-    <button type="button" class="chip" data-prompt="How do I cook perfect pasta?">
-      How to cook pasta?
+      ⚡ Quick 30-min recipe
     </button>
     <button type="button" class="chip" data-prompt="Suggest a healthy vegetarian meal">
-      Healthy vegetarian meal
+      🥗 Healthy vegetarian
     </button>
   </div>
 

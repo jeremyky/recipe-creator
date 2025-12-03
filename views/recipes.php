@@ -49,11 +49,11 @@ $last_cuisine = $last_cuisine ?? '';
     <p class="text-muted"><?= count($recipes) ?> recipe<?= count($recipes) !== 1 ? 's' : '' ?> found</p>
   </div>
   <?php if (empty($recipes)): ?>
-    <div class="card">
-      <p>No recipes found. <a href="index.php?action=upload">Upload a recipe</a> to get started!</p>
+    <div class="card" id="no-recipes-message">
+      <p>No recipes found. <a href="index.php?action=upload">Upload a recipe</a> or <a href="index.php?action=chat">ask the AI for recipes</a> to get started!</p>
     </div>
   <?php else: ?>
-    <div class="grid grid-3">
+    <div class="grid grid-3" id="recipes-grid">
       <?php foreach ($recipes as $recipe): ?>
         <article class="card recipe-card">
           <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
@@ -77,5 +77,98 @@ $last_cuisine = $last_cuisine ?? '';
       <?php endforeach; ?>
     </div>
   <?php endif; ?>
+  
+  <!-- Container for local storage recipes -->
+  <div id="local-recipes-container"></div>
+  
+  <script>
+  // Load and display localStorage recipes (for local testing)
+  (function() {
+    const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+    
+    if (localRecipes.length > 0) {
+      const container = document.getElementById('local-recipes-container');
+      const recipesGrid = document.getElementById('recipes-grid');
+      const noRecipesMsg = document.getElementById('no-recipes-message');
+      
+      // Hide "no recipes" message if we have local recipes
+      if (noRecipesMsg && localRecipes.length > 0) {
+        noRecipesMsg.style.display = 'none';
+      }
+      
+      // Create or get grid
+      let grid = recipesGrid;
+      if (!grid) {
+        grid = document.createElement('div');
+        grid.className = 'grid grid-3';
+        grid.id = 'recipes-grid';
+        container.parentElement.insertBefore(grid, container);
+      }
+      
+      // Add section header for local recipes
+      const header = document.createElement('div');
+      header.style.gridColumn = '1 / -1';
+      header.innerHTML = '<p class="chip chip-info" style="display: inline-block; margin-bottom: 1rem;">📦 Local Testing Mode - Recipes stored in browser</p>';
+      grid.appendChild(header);
+      
+      // Add each local recipe
+      localRecipes.forEach(recipe => {
+        const ingredientCount = recipe.ingredients ? recipe.ingredients.split('\n').filter(l => l.trim()).length : 0;
+        const createdDate = recipe.created_at ? new Date(recipe.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+        
+        const card = document.createElement('article');
+        card.className = 'card recipe-card';
+        card.innerHTML = `
+          <div style="display: block; text-decoration: none; color: inherit; cursor: pointer;" onclick="viewLocalRecipe('${recipe.id}')">
+            <div class="card-image recipe-img">
+              <span style="font-size: 64px; opacity: 0.3;">🍳</span>
+            </div>
+            <div class="card-header">
+              <h3>${escapeHtml(recipe.title)}</h3>
+              <p class="text-small">
+                ${createdDate} • 
+                <span class="chip chip-primary" style="margin-left: 8px;">${ingredientCount} ingredients</span>
+              </p>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      
+      // Update recipe count
+      const countElement = document.querySelector('.section-header .text-muted');
+      if (countElement) {
+        const dbCount = <?= count($recipes) ?>;
+        const totalCount = dbCount + localRecipes.length;
+        countElement.textContent = `${totalCount} recipe${totalCount !== 1 ? 's' : ''} found (${localRecipes.length} local)`;
+      }
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Function to view local recipe details
+    window.viewLocalRecipe = function(recipeId) {
+      const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+      const recipe = localRecipes.find(r => r.id === recipeId);
+      
+      if (recipe) {
+        // Show recipe in modal or alert
+        const ingredients = recipe.ingredients.split('\n').map(i => `• ${i}`).join('\n');
+        const steps = recipe.steps.split('\n').map((s, i) => `${i + 1}. ${s}`).join('\n');
+        
+        alert(`📖 ${recipe.title}\n\n` +
+              `🍽️ Cuisine: ${recipe.cuisine || 'Not specified'}\n\n` +
+              `📝 INGREDIENTS:\n${ingredients}\n\n` +
+              `👨‍🍳 STEPS:\n${steps}\n\n` +
+              `💡 This recipe is stored locally in your browser for testing.`);
+      }
+    };
+  })();
+  </script>
 </section>
 

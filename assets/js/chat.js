@@ -79,7 +79,7 @@ const ChatInterface = {
     },
     
     // Add message to chat
-    addMessage: function(content, type = 'user') {
+    addMessage: function(content, type = 'user', isSuccess = false) {
         const messagesContainer = document.getElementById('chat-messages');
         if (!messagesContainer) return;
         
@@ -93,10 +93,18 @@ const ChatInterface = {
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${type}`;
         
+        // Add success highlight if specified
+        if (isSuccess) {
+            messageDiv.classList.add('success-highlight');
+            messageDiv.style.background = 'var(--color-success-soft)';
+            messageDiv.style.borderLeft = '3px solid var(--color-success)';
+            messageDiv.style.padding = '12px';
+        }
+        
         // Create avatar
         const avatar = document.createElement('div');
         avatar.className = 'chat-message-avatar';
-        avatar.textContent = type === 'user' ? 'You' : 'AI';
+        avatar.textContent = type === 'user' ? 'You' : (isSuccess ? '✅' : 'AI');
         
         // Create content
         const messageContent = document.createElement('div');
@@ -123,6 +131,153 @@ const ChatInterface = {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
         return messageDiv;
+    },
+    
+    // Save recipe from AI response to user's collection
+    saveRecipeFromAI: function(buttonElement) {
+        // Get the recipe text from the container
+        const container = buttonElement.closest('.recipe-extract-container');
+        const recipeText = container.querySelector('div[style*="monospace"]').textContent;
+        
+        // Parse the recipe format
+        const recipe = this.parseRecipeFormat(recipeText);
+        
+        if (!recipe) {
+            alert('❌ Could not parse recipe. Please try copying manually.');
+            return;
+        }
+        
+        // Disable button and show loading
+        buttonElement.disabled = true;
+        buttonElement.textContent = '💾 Saving...';
+        
+        // Send to backend
+        console.log('💾 Saving recipe:', recipe);
+        
+        fetch('api/save_ai_recipe.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(recipe)
+        })
+        .then(response => {
+            console.log('📡 Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ Server response:', data);
+            if (data.success) {
+                // Handle local storage mode
+                if (data.mode === 'local' && data.recipe) {
+                    // Save to localStorage for local testing
+                    const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+                    localRecipes.push({
+                        id: data.recipe_id,
+                        ...data.recipe
+                    });
+                    localStorage.setItem('local_recipes', JSON.stringify(localRecipes));
+                    
+                    console.log('📦 Recipe saved to localStorage:', data.recipe);
+                    console.log('📊 Total local recipes:', localRecipes.length);
+                    
+                    // Show browser notification if supported
+                    if (window.Notification && Notification.permission === 'granted') {
+                        new Notification('Recipe Saved!', {
+                            body: `"${recipe.title}" has been saved to your local storage`,
+                            icon: '🍳'
+                        });
+                    }
+                }
+                
+                // Update button state
+                buttonElement.textContent = '✅ Saved!';
+                buttonElement.style.background = 'var(--color-success)';
+                
+                // Show prominent success message with highlighting
+                const successMsg = data.mode === 'local' 
+                    ? `<strong>Recipe Saved Successfully!</strong><br><br>"${recipe.title}" has been saved to your browser's local storage for testing.<br><br><a href="index.php?action=recipes" style="color: var(--color-primary); font-weight: 600; text-decoration: underline;">📖 View your recipes →</a>`
+                    : `<strong>Recipe Saved Successfully!</strong><br><br>"${recipe.title}" has been saved to your collection!<br><br><a href="index.php?action=recipes" style="color: var(--color-primary); font-weight: 600; text-decoration: underline;">📖 View your recipes →</a>`;
+                
+                this.addMessage(successMsg, 'assistant', true); // true = success highlight
+                
+                // Scroll to show the success message
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Re-enable after 3 seconds
+                setTimeout(() => {
+                    buttonElement.disabled = false;
+                    buttonElement.textContent = '💾 Save Recipe to Collection';
+                    buttonElement.style.background = '';
+                }, 3000);
+            } else {
+                throw new Error(data.error || 'Failed to save recipe');
+            }
+        })
+        .catch(error => {
+            console.error('Save error:', error);
+            buttonElement.disabled = false;
+            buttonElement.textContent = '❌ Save Failed';
+            buttonElement.style.background = 'var(--color-danger)';
+            alert('Failed to save recipe: ' + error.message);
+            
+            setTimeout(() => {
+                buttonElement.textContent = '💾 Save Recipe to Collection';
+                buttonElement.style.background = '';
+            }, 3000);
+        });
+    },
+    
+    // Parse structured recipe format
+    parseRecipeFormat: function(text) {
+        try {
+            // Extract title
+            const titleMatch = text.match(/TITLE:\s*(.+)/);
+            if (!titleMatch) return null;
+            const title = titleMatch[1].trim();
+            
+            // Extract cuisine
+            const cuisineMatch = text.match(/CUISINE:\s*(.+)/);
+            const cuisine = cuisineMatch ? cuisineMatch[1].trim() : 'other';
+            
+            // Extract ingredients
+            const ingredientsSection = text.match(/INGREDIENTS:([\s\S]*?)(?=\n\nSTEPS:|$)/);
+            if (!ingredientsSection) return null;
+            
+            const ingredientLines = ingredientsSection[1]
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.startsWith('-'))
+                .map(line => line.substring(1).trim());
+            
+            if (ingredientLines.length === 0) return null;
+            const ingredients = ingredientLines.join('\n');
+            
+            // Extract steps
+            const stepsSection = text.match(/STEPS:([\s\S]*?)(?===== RECIPE END|$)/);
+            if (!stepsSection) return null;
+            
+            const stepLines = stepsSection[1]
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => /^\d+\./.test(line))
+                .map(line => line.replace(/^\d+\.\s*/, ''));
+            
+            if (stepLines.length === 0) return null;
+            const steps = stepLines.join('\n');
+            
+            return {
+                title: title,
+                cuisine: cuisine,
+                ingredients: ingredients,
+                steps: steps
+            };
+        } catch (error) {
+            console.error('Parse error:', error);
+            return null;
+        }
     },
     
     // Setup AJAX chat submission
@@ -160,6 +315,7 @@ const ChatInterface = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'same-origin', // Important: send session cookie!
                 body: JSON.stringify({ 
                     prompt: prompt
                 })
@@ -182,8 +338,24 @@ const ChatInterface = {
                 loadingMessage.remove();
                 
                 if (data.success) {
-                    // Format response
-                    let formattedResponse = data.response
+                    // Format response with special handling for structured recipes
+                    let formattedResponse = data.response;
+                    
+                    // Check if response contains a structured recipe
+                    if (formattedResponse.includes('=== RECIPE START ===')) {
+                        // Extract the recipe data for the save button
+                        const recipeMatch = formattedResponse.match(/=== RECIPE START ===([\s\S]*?)=== RECIPE END ===/);
+                        const recipeData = recipeMatch ? recipeMatch[1] : null;
+                        
+                        // Wrap recipe in a code block with save button
+                        formattedResponse = formattedResponse.replace(
+                            /(=== RECIPE START ===[\s\S]*?=== RECIPE END ===)/g,
+                            '<div class="recipe-extract-container" style="background: var(--color-bg); border: 2px solid var(--color-primary); border-radius: 8px; padding: 16px; margin: 12px 0;"><div style="font-family: monospace; white-space: pre-wrap; font-size: 13px; margin-bottom: 12px; padding: 12px; background: var(--color-bg-elevated); border-radius: 6px;">$1</div><button onclick="window.ChatInterface.saveRecipeFromAI(this)" class="btn-primary" style="width: 100%;">💾 Save Recipe to Collection</button></div>'
+                        );
+                    }
+                    
+                    // Format markdown-like text
+                    formattedResponse = formattedResponse
                         .replace(/\n\n/g, '</p><p>')
                         .replace(/\n/g, '<br>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -198,7 +370,7 @@ const ChatInterface = {
                         noteDiv.innerHTML = `
                             <div class="chat-message-avatar">ℹ️</div>
                             <div class="chat-message-content">
-                                <p style="font-size: 12px; font-style: italic; opacity: 0.7;">Note: Using fallback response. Set OPENAI_API_KEY for full AI functionality.</p>
+                                <p style="font-size: 12px; font-style: italic; opacity: 0.7;">💳 Note: Limited response (OpenAI API quota exceeded). Add credits to your OpenAI account for full AI functionality.</p>
                             </div>
                         `;
                         document.getElementById('chat-messages').appendChild(noteDiv);
@@ -215,11 +387,13 @@ const ChatInterface = {
                 let errorMessage = 'Sorry, there was an error processing your request.';
                 
                 if (error.message.includes('Unauthorized')) {
-                    errorMessage = 'Access denied. Please contact the administrator.';
-                } else if (error.message.includes('Rate limit')) {
-                    errorMessage = error.message;
+                    errorMessage = '🔒 Access denied. Please refresh the page and try again.';
+                } else if (error.message.includes('Rate limit') || error.message.includes('too many requests')) {
+                    errorMessage = '⏱️ Rate limit exceeded. You can send 5 messages every 2 minutes to prevent abuse. Please wait a moment before trying again.';
+                } else if (error.message.includes('quota') || error.message.includes('insufficient')) {
+                    errorMessage = '💳 API quota exceeded. The OpenAI API has run out of credits. Please add billing to your OpenAI account.';
                 } else {
-                    errorMessage = 'Sorry, there was an error processing your request. Please try again.';
+                    errorMessage = '❌ Sorry, there was an error processing your request. Please try again.';
                 }
                 
                 this.addMessage(errorMessage, 'assistant');
