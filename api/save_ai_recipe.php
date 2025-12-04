@@ -5,175 +5,178 @@
  * CS 4640 Sprint 4
  */
 
+// Prevent any output before JSON
+error_reporting(0);
+ini_set('display_errors', '0');
+
+// Start output buffering to catch any stray output
+ob_start();
+
+// Load dependencies
 require __DIR__ . '/../lib/session.php';
 require __DIR__ . '/../lib/util.php';
 require __DIR__ . '/../lib/db.php';
 require __DIR__ . '/../lib/repo.php';
-require __DIR__ . '/../lib/validate.php';
+require __DIR__ . '/../lib/auth.php';
 
-// Only allow POST requests
+// Function to send JSON response
+function send_json($data, $code = 200) {
+    // Log to file for debugging
+    $log_file = sys_get_temp_dir() . '/recipe_api_debug.log';
+    $log_entry = date('Y-m-d H:i:s') . " [HTTP $code] " . json_encode($data) . "\n";
+    file_put_contents($log_file, $log_entry, FILE_APPEND);
+    
+    // Discard any buffered output
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
+    http_response_code($code);
+    header('Content-Type: application/json; charset=utf-8');
+    $json = json_encode($data);
+    
+    // Log the actual output
+    file_put_contents($log_file, "  OUTPUT: " . strlen($json) . " bytes\n", FILE_APPEND);
+    
+    echo $json;
+    exit();
+}
+
+// Helper function to log debug info
+function debug_log_api($message) {
+    $log_file = sys_get_temp_dir() . '/recipe_api_debug.log';
+    file_put_contents($log_file, date('Y-m-d H:i:s') . " [DEBUG] " . $message . "\n", FILE_APPEND);
+}
+
+// Validate request method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    json_out(['error' => 'Method not allowed'], 405);
+    send_json(['error' => 'Method not allowed'], 405);
 }
 
-// Check authentication
-if (!is_authenticated()) {
-    json_out(['error' => 'Unauthorized'], 401);
+// Check authentication (auto-login on localhost for testing)
+if ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_NAME'] === '127.0.0.1') {
+    // Auto-login for local testing
+    if (!is_authenticated()) {
+        $_SESSION['user_id'] = 1;
+        $_SESSION['user_name'] = 'Demo User';
+    }
+} else {
+    // Production: require authentication
+    if (!is_authenticated()) {
+        send_json(['error' => 'Unauthorized - Please log in'], 401);
+    }
 }
 
-// Get JSON input
-$input = json_decode(file_get_contents('php://input'), true);
+// Get and parse JSON input
+$json_input = file_get_contents('php://input');
+$input = json_decode($json_input, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    send_json(['error' => 'Invalid JSON: ' . json_last_error_msg()], 400);
+}
+
+// Extract data
+$title = isset($input['title']) ? trim($input['title']) : '';
+$cuisine = isset($input['cuisine']) ? trim($input['cuisine']) : 'other';
+$ingredients = isset($input['ingredients']) ? trim($input['ingredients']) : '';
+$steps = isset($input['steps']) ? trim($input['steps']) : '';
+
+// Log what we received
+debug_log_api("Received recipe data:");
+debug_log_api("  Title: '" . substr($title, 0, 100) . "' (length: " . strlen($title) . ")");
+debug_log_api("  Cuisine: " . $cuisine);
+debug_log_api("  Ingredients length: " . strlen($ingredients));
+debug_log_api("  Steps length: " . strlen($steps));
 
 // Validate required fields
-$required = ['title', 'ingredients', 'steps'];
-foreach ($required as $field) {
-    if (!isset($input[$field]) || empty(trim($input[$field]))) {
-        json_out(['error' => "Field '$field' is required"], 400);
-    }
+if (empty($title)) {
+    send_json(['error' => 'Recipe title is required'], 400);
 }
 
-// Extract and validate data
-$title = trim($input['title']);
-$cuisine = isset($input['cuisine']) ? trim($input['cuisine']) : null;
-$ingredients = trim($input['ingredients']);
-$steps = trim($input['steps']);
+if (empty($ingredients)) {
+    send_json(['error' => 'Ingredients are required'], 400);
+}
+
+if (empty($steps)) {
+    send_json(['error' => 'Steps are required'], 400);
+}
+
+// Validate lengths
+if (strlen($title) < 3) {
+    send_json(['error' => 'Title must be at least 3 characters'], 400);
+}
+
+if (strlen($title) > 2000) {
+    send_json(['error' => 'Title is too long (max 2000 characters, got ' . strlen($title) . ')'], 400);
+}
+
+// Get user ID
 $user_id = user_id();
 
-// Validate title
-if (strlen($title) < 3) {
-    json_out(['error' => 'Recipe title must be at least 3 characters'], 400);
-}
+// Try database connection
+$db = db_connect();
 
-if (strlen($title) > 200) {
-    json_out(['error' => 'Recipe title is too long'], 400);
-}
-
-// Validate cuisine if provided
-$valid_cuisines = ['italian', 'chinese', 'mexican', 'indian', 'thai', 'greek', 'american', 'other'];
-if ($cuisine && !in_array(strtolower($cuisine), $valid_cuisines)) {
-    $cuisine = 'other';
-}
-
-// Validate ingredients
-if (strlen($ingredients) < 10) {
-    json_out(['error' => 'Ingredients list is too short'], 400);
-}
-
-// Validate steps
-if (strlen($steps) < 10) {
-    json_out(['error' => 'Recipe steps are too short'], 400);
-}
-
-// Check for duplicates (same title for same user)
-$existing_recipes = get_recipes($user_id);
-foreach ($existing_recipes as $recipe) {
-    if (strtolower($recipe['title']) === strtolower($title)) {
-        json_out(['error' => 'You already have a recipe with this title'], 400);
-    }
-}
-
-// Try to insert the recipe
-try {
-    $db = db();
-    
-    if (!$db) {
-        // Local development mode without database - use localStorage
-        json_out([
-            'success' => true,
-            'message' => 'Recipe saved to local storage',
-            'recipe_id' => 'local_' . time(),
+// If no database, return local storage mode
+if (!$db) {
+    send_json([
+        'success' => true,
+        'message' => 'Recipe saved to local storage',
+        'recipe_id' => 'local_' . time() . '_' . rand(1000, 9999),
+        'title' => $title,
+        'mode' => 'local',
+        'recipe' => [
             'title' => $title,
-            'mode' => 'local',
-            'recipe' => [
-                'title' => $title,
-                'cuisine' => $cuisine,
-                'ingredients' => $ingredients,
-                'steps' => $steps,
-                'created_at' => date('Y-m-d H:i:s')
-            ]
-        ]);
-    }
-    
+            'cuisine' => $cuisine,
+            'ingredients' => $ingredients,
+            'steps' => $steps,
+            'created_at' => date('Y-m-d H:i:s')
+        ]
+    ]);
+}
+
+// Save to database
+try {
     // Insert recipe
     $stmt = $db->prepare('
-        INSERT INTO recipe (user_id, title, cuisine, created_at)
-        VALUES (?, ?, ?, NOW())
+        INSERT INTO recipe (user_id, title, cuisine, steps, created_at)
+        VALUES (?, ?, ?, ?, NOW())
         RETURNING id
     ');
     
-    $stmt->execute([$user_id, $title, $cuisine]);
+    $stmt->execute([$user_id, $title, $cuisine, $steps]);
     $recipe_id = $stmt->fetchColumn();
     
     if (!$recipe_id) {
-        json_out(['error' => 'Failed to create recipe'], 500);
+        send_json(['error' => 'Failed to create recipe'], 500);
     }
     
-    // Parse and insert ingredients
+    // Insert ingredients
     $ingredient_lines = explode("\n", $ingredients);
-    $ingredient_order = 0;
+    $stmt = $db->prepare('
+        INSERT INTO recipe_ingredient (recipe_id, line)
+        VALUES (?, ?)
+    ');
     
     foreach ($ingredient_lines as $line) {
         $line = trim($line);
-        if (empty($line)) continue;
-        
-        $ingredient_order++;
-        
-        // Try to parse quantity, unit, and ingredient name
-        // Format: "quantity unit ingredient" or just "ingredient"
-        $parts = preg_split('/\s+/', $line, 3);
-        
-        if (count($parts) >= 3) {
-            // Has quantity, unit, and name
-            $quantity = $parts[0];
-            $unit = $parts[1];
-            $ingredient_name = $parts[2];
-        } else if (count($parts) === 2) {
-            // Has quantity and name (or unit and name)
-            $quantity = $parts[0];
-            $unit = '';
-            $ingredient_name = $parts[1];
-        } else {
-            // Just ingredient name
-            $quantity = '';
-            $unit = '';
-            $ingredient_name = $line;
+        if (!empty($line)) {
+            $stmt->execute([$recipe_id, $line]);
         }
-        
-        $stmt = $db->prepare('
-            INSERT INTO recipe_ingredient (recipe_id, ingredient, quantity, unit, ingredient_order)
-            VALUES (?, ?, ?, ?, ?)
-        ');
-        
-        $stmt->execute([$recipe_id, $ingredient_name, $quantity, $unit, $ingredient_order]);
     }
     
-    // Parse and insert steps
-    $step_lines = explode("\n", $steps);
-    $step_order = 0;
-    
-    foreach ($step_lines as $line) {
-        $line = trim($line);
-        if (empty($line)) continue;
-        
-        $step_order++;
-        
-        $stmt = $db->prepare('
-            INSERT INTO recipe_step (recipe_id, step_order, step_text)
-            VALUES (?, ?, ?)
-        ');
-        
-        $stmt->execute([$recipe_id, $step_order, $line]);
-    }
-    
-    json_out([
+    // Success!
+    send_json([
         'success' => true,
-        'message' => 'Recipe saved successfully',
+        'message' => 'Recipe saved successfully to database',
         'recipe_id' => $recipe_id,
-        'title' => $title
+        'title' => $title,
+        'mode' => 'db'
     ]);
     
 } catch (PDOException $e) {
-    error_log('Database error saving AI recipe: ' . $e->getMessage());
-    json_out(['error' => 'Database error: ' . $e->getMessage()], 500);
+    error_log('Database error in save_ai_recipe: ' . $e->getMessage());
+    send_json(['error' => 'Database error: ' . $e->getMessage()], 500);
+} catch (Exception $e) {
+    error_log('Error in save_ai_recipe: ' . $e->getMessage());
+    send_json(['error' => 'Server error: ' . $e->getMessage()], 500);
 }
-

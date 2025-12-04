@@ -133,19 +133,63 @@ function update_recipe($recipeId, $userId, $data) {
         return false; // Return false if no database connection
     }
     
-    $stmt = $pdo->prepare("
-        UPDATE recipe 
-        SET title = :title, image_url = :image_url, steps = :steps
-        WHERE id = :id AND user_id = :user_id
-    ");
+    // Start transaction
+    $pdo->beginTransaction();
     
-    return $stmt->execute([
-        'id' => $recipeId,
-        'user_id' => $userId,
-        'title' => $data['title'],
-        'image_url' => $data['image_url'] ?? null,
-        'steps' => $data['steps']
-    ]);
+    try {
+        // Update recipe basic info
+        $stmt = $pdo->prepare("
+            UPDATE recipe 
+            SET title = :title, cuisine = :cuisine, image_url = :image_url, steps = :steps
+            WHERE id = :id AND user_id = :user_id
+        ");
+        
+        $stmt->execute([
+            'id' => $recipeId,
+            'user_id' => $userId,
+            'title' => $data['title'],
+            'cuisine' => $data['cuisine'] ?? null,
+            'image_url' => $data['image_url'] ?? null,
+            'steps' => $data['steps']
+        ]);
+        
+        // Update ingredients if provided
+        if (isset($data['ingredients'])) {
+            // Delete existing ingredients
+            $stmt = $pdo->prepare("DELETE FROM recipe_ingredient WHERE recipe_id = :recipe_id");
+            $stmt->execute(['recipe_id' => $recipeId]);
+            
+            // Insert new ingredients
+            $ingredientLines = explode("\n", $data['ingredients']);
+            $order = 0;
+            
+            foreach ($ingredientLines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+                
+                $order++;
+                
+                $stmt = $pdo->prepare("
+                    INSERT INTO recipe_ingredient (recipe_id, ingredient, ingredient_order)
+                    VALUES (:recipe_id, :ingredient, :order)
+                ");
+                
+                $stmt->execute([
+                    'recipe_id' => $recipeId,
+                    'ingredient' => $line,
+                    'order' => $order
+                ]);
+            }
+        }
+        
+        $pdo->commit();
+        return true;
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Error updating recipe: " . $e->getMessage());
+        return false;
+    }
 }
 
 /**

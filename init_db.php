@@ -44,6 +44,7 @@ $sql_statements = [
       id SERIAL PRIMARY KEY,
       user_id INT REFERENCES app_user(id) ON DELETE CASCADE,
       title TEXT NOT NULL,
+      cuisine TEXT,
       image_url TEXT,
       steps TEXT NOT NULL,
       created_at TIMESTAMP DEFAULT NOW()
@@ -67,6 +68,8 @@ $sql_statements = [
     "CREATE INDEX IF NOT EXISTS idx_recipe_user_id ON recipe(user_id)",
     "CREATE INDEX IF NOT EXISTS idx_pantry_user_id ON pantry_item(user_id)",
     "CREATE INDEX IF NOT EXISTS idx_recipe_ingredient_recipe_id ON recipe_ingredient(recipe_id)",
+    
+    "ALTER TABLE recipe ADD COLUMN IF NOT EXISTS cuisine TEXT",
     
     "INSERT INTO app_user (id, email) VALUES (1, 'demo@example.com') ON CONFLICT (id) DO NOTHING",
     

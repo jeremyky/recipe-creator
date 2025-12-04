@@ -357,6 +357,164 @@ switch ($action) {
         render('recipe_detail', ['recipe' => $recipe, 'ingredients' => $ingredients]);
         break;
     
+    case 'recipe_edit':
+        require_auth();
+        $recipeId = $_GET['id'] ?? '';
+        
+        // Handle local recipes (for local testing)
+        if (strpos($recipeId, 'local_') === 0) {
+            // Local recipe - pass minimal data, JavaScript will handle it
+            render('recipe_edit', ['recipe' => ['id' => $recipeId]]);
+            break;
+        }
+        
+        // Database recipe
+        $recipeId = intval($recipeId);
+        if ($recipeId <= 0) {
+            redirect('index.php?action=recipes');
+        }
+        
+        $recipe = get_recipe($recipeId, user_id());
+        if (!$recipe) {
+            flash('error', 'Recipe not found');
+            redirect('index.php?action=recipes');
+        }
+        
+        // Get ingredients as formatted text
+        $ingredients = get_recipe_ingredients($recipeId);
+        $recipe['ingredients_text'] = implode("\n", $ingredients);
+        
+        render('recipe_edit', ['recipe' => $recipe]);
+        break;
+    
+    case 'recipe_update':
+        require_auth();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('index.php?action=recipes');
+        }
+        
+        $recipeId = intval($_GET['id'] ?? 0);
+        if ($recipeId <= 0) {
+            redirect('index.php?action=recipes');
+        }
+        
+        // Verify recipe ownership
+        $recipe = get_recipe($recipeId, user_id());
+        if (!$recipe) {
+            flash('error', 'Recipe not found or you do not have permission to edit it');
+            redirect('index.php?action=recipes');
+        }
+        
+        // Validate CSRF
+        if (!csrf_check($_POST['csrf'] ?? '')) {
+            flash('error', 'Invalid CSRF token');
+            redirect('index.php?action=recipe_edit&id=' . $recipeId);
+        }
+        
+        // Get and validate input
+        $title = trim($_POST['title'] ?? '');
+        $cuisine = trim($_POST['cuisine'] ?? '');
+        $image = trim($_POST['image'] ?? '');
+        $ingredients = trim($_POST['ingredients'] ?? '');
+        $steps = trim($_POST['steps'] ?? '');
+        
+        $errors = [];
+        
+        if (empty($title)) {
+            $errors['title'] = 'Recipe title is required';
+        } elseif (strlen($title) < 3) {
+            $errors['title'] = 'Recipe title must be at least 3 characters';
+        }
+        
+        if (empty($ingredients)) {
+            $errors['ingredients'] = 'Ingredients are required';
+        }
+        
+        if (empty($steps)) {
+            $errors['steps'] = 'Recipe steps are required';
+        } elseif (strlen($steps) < 10) {
+            $errors['steps'] = 'Recipe steps must be at least 10 characters';
+        }
+        
+        if (!empty($errors)) {
+            flash('errors', $errors);
+            set_old($_POST);
+            redirect('index.php?action=recipe_edit&id=' . $recipeId);
+        }
+        
+        // Update recipe in database
+        $updated = update_recipe($recipeId, user_id(), [
+            'title' => $title,
+            'cuisine' => $cuisine,
+            'image_url' => $image,
+            'ingredients' => $ingredients,
+            'steps' => $steps
+        ]);
+        
+        // Check if this is a local recipe (for local testing)
+        $db = db();
+        if (!$db && strpos($recipeId, 'local_') === 0) {
+            // Handle local recipe update via session flag
+            $_SESSION['local_recipe_update'] = [
+                'id' => $recipeId,
+                'title' => $title,
+                'cuisine' => $cuisine,
+                'image_url' => $image,
+                'ingredients' => $ingredients,
+                'steps' => $steps
+            ];
+            flash('success', 'Recipe updated! (Local testing mode - update localStorage via JavaScript)');
+            redirect('index.php?action=recipe_detail&id=' . $recipeId);
+        }
+        
+        if ($updated) {
+            flash('success', 'Recipe updated successfully!');
+            redirect('index.php?action=recipe_detail&id=' . $recipeId);
+        } else {
+            flash('error', 'Failed to update recipe. Please try again.');
+            set_old($_POST);
+            redirect('index.php?action=recipe_edit&id=' . $recipeId);
+        }
+        break;
+    
+    case 'recipe_delete':
+        require_auth();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('index.php?action=recipes');
+        }
+        
+        $recipeId = intval($_GET['id'] ?? 0);
+        if ($recipeId <= 0) {
+            redirect('index.php?action=recipes');
+        }
+        
+        // Verify recipe ownership
+        $recipe = get_recipe($recipeId, user_id());
+        if (!$recipe) {
+            flash('error', 'Recipe not found or you do not have permission to delete it');
+            redirect('index.php?action=recipes');
+        }
+        
+        // Validate CSRF
+        if (!csrf_check($_POST['csrf'] ?? '')) {
+            flash('error', 'Invalid CSRF token');
+            redirect('index.php?action=recipe_detail&id=' . $recipeId);
+        }
+        
+        // Delete recipe
+        $deleted = delete_recipe($recipeId, user_id());
+        
+        if ($deleted) {
+            flash('success', 'Recipe "' . $recipe['title'] . '" has been deleted');
+            redirect('index.php?action=recipes');
+        } else {
+            flash('error', 'Failed to delete recipe. Please try again.');
+            redirect('index.php?action=recipe_detail&id=' . $recipeId);
+        }
+        break;
+    
     case 'cook':
         require_auth();
         $recipes = get_recipes(user_id());

@@ -27,10 +27,16 @@ $ingredients = $ingredients ?? [];
       </p>
     </div>
     
-    <div style="display: flex; gap: var(--space-m); margin-top: var(--space-xl);">
+    <div style="display: flex; gap: var(--space-m); margin-top: var(--space-xl); flex-wrap: wrap;">
       <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" class="btn-primary">
-        Start Cooking
+        👨‍🍳 Start Cooking
       </a>
+      <a href="index.php?action=recipe_edit&id=<?= $recipe['id'] ?>" class="btn-secondary">
+        ✏️ Edit Recipe
+      </a>
+      <button onclick="confirmDeleteRecipe('<?= $recipe['id'] ?>', '<?= h(addslashes($recipe['title'])) ?>')" class="btn-ghost" style="color: var(--color-danger);">
+        🗑️ Delete
+      </button>
     </div>
   </header>
 
@@ -157,4 +163,38 @@ $ingredients = $ingredients ?? [];
   line-height: 1.6;
 }
 </style>
+
+<script>
+function confirmDeleteRecipe(recipeId, recipeTitle) {
+  if (!confirm(`Are you sure you want to delete "${recipeTitle}"?\n\nThis action cannot be undone.`)) {
+    return;
+  }
+  
+  // Check if local recipe
+  if (recipeId.startsWith('local_')) {
+    // Delete from localStorage
+    const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+    const filtered = localRecipes.filter(r => r.id !== recipeId);
+    localStorage.setItem('local_recipes', JSON.stringify(filtered));
+    
+    alert('✅ Recipe deleted successfully!');
+    window.location.href = 'index.php?action=recipes';
+    return;
+  }
+  
+  // Delete from database
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'index.php?action=recipe_delete&id=' + recipeId;
+  
+  const csrfInput = document.createElement('input');
+  csrfInput.type = 'hidden';
+  csrfInput.name = 'csrf';
+  csrfInput.value = '<?= h(csrf_token()) ?>';
+  
+  form.appendChild(csrfInput);
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
 

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Recipe Parser</title>
+    <style>
+        body { font-family: monospace; padding: 20px; max-width: 1200px; margin: 0 auto; background: #1e1e1e; color: #d4d4d4; }
+        textarea { width: 100%; height: 300px; padding: 10px; font-family: monospace; font-size: 13px; background: #252526; color: #d4d4d4; border: 1px solid #3e3e42; }
+        button { padding: 12px 24px; margin: 10px 5px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #005a9e; }
+        #output { background: #252526; padding: 15px; border-radius: 4px; margin-top: 20px; white-space: pre-wrap; }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Recipe Parser Tester</h1>
+    
+    <h2>Paste Recipe Text Here:</h2>
+    <textarea id="recipeInput">=== RECIPE START ===
+TITLE: Lemon Herb Roast Chicken
+CUISINE: American
+INGREDIENTS:
+- 1 whole chicken
+- 2 lemons
+- 4 cloves of garlic
+- 2 tablespoons olive oil
+- Salt and pepper to taste
+- Fresh herbs (rosemary, thyme, or sage)
+STEPS:
+1. Preheat the oven to 400°F (200°C). 
+2. Rinse the chicken and pat it dry. Season the cavity with salt and pepper, then stuff it with halved lemons and garlic cloves.
+3. Tie the chicken legs together with kitchen twine. Rub the outside with olive oil, salt, and pepper.
+4. Place the chicken in a roasting pan, add herbs around it, and roast for about 1.5 hours or until the internal temperature reaches 165°F (74°C).
+5. Let it rest for 10 minutes before carving. Serve with roasted vegetables or salad.
+=== RECIPE END ===</textarea>
+    
+    <button onclick="testParser()">🚀 Test Parser</button>
+    <button onclick="clearOutput()">🗑️ Clear Output</button>
+    
+    <div id="output"></div>
+    
+    <script src="assets/js/chat.js"></script>
+    <script>
+        function log(msg, type = 'info') {
+            const output = document.getElementById('output');
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            output.innerHTML += '<span class="' + className + '">' + msg + '</span>\n';
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+        
+        function testParser() {
+            clearOutput();
+            const text = document.getElementById('recipeInput').value;
+            
+            log('📝 Input text length: ' + text.length);
+            log('📝 First 200 chars: ' + text.substring(0, 200));
+            log('\n');
+            
+            try {
+                const result = window.ChatInterface.parseRecipeFormat(text);
+                
+                if (result) {
+                    log('✅ PARSING SUCCESSFUL!', 'success');
+                    log('\n');
+                    log('📖 Title: ' + result.title, 'success');
+                    log('🍽️ Cuisine: ' + result.cuisine, 'success');
+                    log('📝 Ingredients (' + result.ingredients.split('\n').length + ' lines):', 'success');
+                    result.ingredients.split('\n').forEach((ing, i) => {
+                        log('   ' + (i + 1) + '. ' + ing, 'success');
+                    });
+                    log('\n');
+                    log('👨‍🍳 Steps (' + result.steps.split('\n').length + ' lines):', 'success');
+                    result.steps.split('\n').forEach((step, i) => {
+                        log('   ' + step.substring(0, 80) + (step.length > 80 ? '...' : ''), 'success');
+                    });
+                    
+                    log('\n');
+                    log('✅ Ready to save to API!', 'success');
+                    
+                } else {
+                    log('❌ PARSING FAILED!', 'error');
+                    log('Check console for detailed error messages', 'error');
+                }
+                
+            } catch (error) {
+                log('❌ ERROR: ' + error.message, 'error');
+                log('Stack: ' + error.stack, 'error');
+            }
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', function() {
+            setTimeout(testParser, 500);
+        });
+    </script>
+</body>
+</html>
+

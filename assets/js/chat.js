@@ -135,24 +135,70 @@ const ChatInterface = {
     
     // Save recipe from AI response to user's collection
     saveRecipeFromAI: function(buttonElement) {
+        console.log('🔵 saveRecipeFromAI called!');
+        
         // Get the recipe text from the container
         const container = buttonElement.closest('.recipe-extract-container');
-        const recipeText = container.querySelector('div[style*="monospace"]').textContent;
+        if (!container) {
+            console.error('❌ Container not found!');
+            alert('❌ Error: Could not find recipe container');
+            return;
+        }
+        
+        // Get recipe text from data attribute (preserves newlines)
+        let recipeText = container.getAttribute('data-recipe-text');
+        
+        if (!recipeText) {
+            console.error('❌ No recipe text in data attribute, trying textContent...');
+            // Fallback to textContent
+            const recipeTextDiv = container.querySelector('div[style*="monospace"]');
+            if (!recipeTextDiv) {
+                console.error('❌ Recipe text div not found!');
+                alert('❌ Error: Could not find recipe text');
+                return;
+            }
+            recipeText = recipeTextDiv.textContent;
+        } else {
+            // Unescape HTML entities
+            recipeText = recipeText.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+        }
+        
+        // Clean up HTML tags that got into the text
+        recipeText = recipeText
+            .replace(/<br\s*\/?>/gi, '\n')           // Convert <br> to newlines
+            .replace(/<\/p>\s*<p>/gi, '\n\n')        // Convert </p><p> to double newlines
+            .replace(/<p>/gi, '')                     // Remove opening <p> tags
+            .replace(/<\/p>/gi, '')                   // Remove closing </p> tags
+            .replace(/&nbsp;/gi, ' ')                 // Replace &nbsp; with spaces
+            .trim();
+        
+        console.log('📄 Recipe text extracted (first 200 chars):', recipeText.substring(0, 200));
+        console.log('📏 Full text length:', recipeText.length);
+        console.log('🔍 Has newlines:', recipeText.includes('\n') ? 'YES ✅' : 'NO ❌');
+        console.log('🔍 Full text:', recipeText);
         
         // Parse the recipe format
         const recipe = this.parseRecipeFormat(recipeText);
         
         if (!recipe) {
-            alert('❌ Could not parse recipe. Please try copying manually.');
+            console.error('❌ Failed to parse recipe');
+            console.error('💾 Full recipe text that failed to parse:');
+            console.error(recipeText);
+            
+            // Show more helpful error with first few lines
+            const firstLines = recipeText.split('\n').slice(0, 5).join('\n');
+            alert('❌ Could not parse recipe.\n\nFirst few lines:\n' + firstLines + '\n\nCheck console for full text (F12)');
             return;
         }
+        
+        console.log('✅ Recipe parsed successfully:', recipe);
         
         // Disable button and show loading
         buttonElement.disabled = true;
         buttonElement.textContent = '💾 Saving...';
         
         // Send to backend
-        console.log('💾 Saving recipe:', recipe);
+        console.log('🚀 Sending to backend...');
         
         fetch('api/save_ai_recipe.php', {
             method: 'POST',
@@ -164,7 +210,29 @@ const ChatInterface = {
         })
         .then(response => {
             console.log('📡 Response status:', response.status);
-            return response.json();
+            console.log('📋 Response headers:', {
+                'content-type': response.headers.get('content-type'),
+                'content-length': response.headers.get('content-length')
+            });
+            
+            // Get response as text first to see what we're actually receiving
+            return response.text().then(text => {
+                console.log('📥 RAW RESPONSE (' + text.length + ' bytes):', text);
+                
+                if (!text || text.trim() === '') {
+                    throw new Error('Empty response from server');
+                }
+                
+                try {
+                    const data = JSON.parse(text);
+                    console.log('✅ Parsed JSON:', data);
+                    return data;
+                } catch (parseError) {
+                    console.error('❌ JSON Parse Error:', parseError.message);
+                    console.error('First 500 chars of response:', text.substring(0, 500));
+                    throw new Error('Invalid JSON response: ' + parseError.message);
+                }
+            });
         })
         .then(data => {
             console.log('✅ Server response:', data);
@@ -233,49 +301,97 @@ const ChatInterface = {
     // Parse structured recipe format
     parseRecipeFormat: function(text) {
         try {
-            // Extract title
-            const titleMatch = text.match(/TITLE:\s*(.+)/);
-            if (!titleMatch) return null;
+            console.log('🔍 Parsing recipe text (first 300 chars):', text.substring(0, 300));
+            console.log('📏 Total length:', text.length);
+            
+            // Extract title (only up to newline)
+            const titleMatch = text.match(/TITLE:\s*([^\n\r]+)/i);
+            if (!titleMatch) {
+                console.error('❌ No title found. Text starts with:', text.substring(0, 100));
+                return null;
+            }
             const title = titleMatch[1].trim();
+            console.log('✅ Title extracted:', title);
             
-            // Extract cuisine
-            const cuisineMatch = text.match(/CUISINE:\s*(.+)/);
-            const cuisine = cuisineMatch ? cuisineMatch[1].trim() : 'other';
+            // Extract cuisine (only up to newline)
+            const cuisineMatch = text.match(/CUISINE:\s*([^\n\r]+)/i);
+            const cuisine = cuisineMatch ? cuisineMatch[1].trim().toLowerCase() : 'other';
+            console.log('✅ Cuisine extracted:', cuisine);
             
-            // Extract ingredients
-            const ingredientsSection = text.match(/INGREDIENTS:([\s\S]*?)(?=\n\nSTEPS:|$)/);
-            if (!ingredientsSection) return null;
+            // Extract ingredients section (more flexible with whitespace)
+            const ingredientsSection = text.match(/INGREDIENTS:\s*[\r\n]+([\s\S]*?)(?=[\r\n]+\s*STEPS:)/i);
+            if (!ingredientsSection) {
+                console.error('❌ No ingredients section found');
+                console.error('Looking for pattern between INGREDIENTS: and STEPS:');
+                const ingredientsStart = text.indexOf('INGREDIENTS:');
+                const stepsStart = text.indexOf('STEPS:');
+                if (ingredientsStart !== -1 && stepsStart !== -1) {
+                    console.error('Found INGREDIENTS at', ingredientsStart, 'and STEPS at', stepsStart);
+                    console.error('Text between:', text.substring(ingredientsStart, stepsStart));
+                }
+                return null;
+            }
             
+            // Parse ingredient lines (remove dashes/bullets and trim)
             const ingredientLines = ingredientsSection[1]
-                .split('\n')
+                .split(/[\r\n]+/)
                 .map(line => line.trim())
-                .filter(line => line.startsWith('-'))
-                .map(line => line.substring(1).trim());
+                .filter(line => {
+                    // Accept lines that start with -, •, or numbers, and have content
+                    return line.length > 0 && 
+                           (line.startsWith('-') || line.startsWith('•') || /^\d/.test(line)) &&
+                           !line.match(/^(STEPS|CUISINE|TITLE):/i);
+                })
+                .map(line => line.replace(/^[-•]\s*/, '').trim());
             
-            if (ingredientLines.length === 0) return null;
+            if (ingredientLines.length === 0) {
+                console.error('❌ No ingredient lines found after filtering');
+                return null;
+            }
+            
             const ingredients = ingredientLines.join('\n');
+            console.log(`✅ ${ingredientLines.length} ingredients extracted:`, ingredientLines.slice(0, 3));
             
-            // Extract steps
-            const stepsSection = text.match(/STEPS:([\s\S]*?)(?===== RECIPE END|$)/);
-            if (!stepsSection) return null;
+            // Extract steps section (more flexible)
+            const stepsSection = text.match(/STEPS:\s*[\r\n]+([\s\S]*?)(?=[\r\n]+\s*===|\s*$)/i);
+            if (!stepsSection) {
+                console.error('❌ No steps section found');
+                return null;
+            }
             
+            // Parse step lines (keep numbers)
             const stepLines = stepsSection[1]
-                .split('\n')
+                .split(/[\r\n]+/)
                 .map(line => line.trim())
-                .filter(line => /^\d+\./.test(line))
-                .map(line => line.replace(/^\d+\.\s*/, ''));
+                .filter(line => line.length > 0 && /^\d+\./.test(line));
             
-            if (stepLines.length === 0) return null;
+            if (stepLines.length === 0) {
+                console.error('❌ No step lines found after filtering');
+                return null;
+            }
+            
             const steps = stepLines.join('\n');
+            console.log(`✅ ${stepLines.length} steps extracted:`, stepLines.slice(0, 2));
             
-            return {
+            const result = {
                 title: title,
                 cuisine: cuisine,
                 ingredients: ingredients,
                 steps: steps
             };
+            
+            console.log('✅ Final parsed recipe:', {
+                title: result.title,
+                cuisine: result.cuisine,
+                ingredientsCount: result.ingredients.split('\n').length,
+                stepsCount: result.steps.split('\n').length
+            });
+            
+            return result;
+            
         } catch (error) {
-            console.error('Parse error:', error);
+            console.error('❌ Parse error:', error);
+            console.error('Stack:', error.stack);
             return null;
         }
     },
@@ -345,12 +461,17 @@ const ChatInterface = {
                     if (formattedResponse.includes('=== RECIPE START ===')) {
                         // Extract the recipe data for the save button
                         const recipeMatch = formattedResponse.match(/=== RECIPE START ===([\s\S]*?)=== RECIPE END ===/);
-                        const recipeData = recipeMatch ? recipeMatch[1] : null;
+                        const recipeData = recipeMatch ? recipeMatch[0] : null; // Get full match including markers
                         
                         // Wrap recipe in a code block with save button
+                        // Store raw recipe text in data attribute to preserve newlines
                         formattedResponse = formattedResponse.replace(
                             /(=== RECIPE START ===[\s\S]*?=== RECIPE END ===)/g,
-                            '<div class="recipe-extract-container" style="background: var(--color-bg); border: 2px solid var(--color-primary); border-radius: 8px; padding: 16px; margin: 12px 0;"><div style="font-family: monospace; white-space: pre-wrap; font-size: 13px; margin-bottom: 12px; padding: 12px; background: var(--color-bg-elevated); border-radius: 6px;">$1</div><button onclick="window.ChatInterface.saveRecipeFromAI(this)" class="btn-primary" style="width: 100%;">💾 Save Recipe to Collection</button></div>'
+                            function(match) {
+                                // Escape the recipe text for data attribute
+                                const escaped = match.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                                return '<div class="recipe-extract-container" data-recipe-text="' + escaped + '" style="background: var(--color-bg); border: 2px solid var(--color-primary); border-radius: 8px; padding: 16px; margin: 12px 0;"><div style="font-family: monospace; white-space: pre-wrap; font-size: 13px; margin-bottom: 12px; padding: 12px; background: var(--color-bg-elevated); border-radius: 6px;">' + match + '</div><button onclick="window.ChatInterface.saveRecipeFromAI(this)" class="btn-primary" style="width: 100%;">💾 Save Recipe to Collection</button></div>';
+                            }
                         );
                     }
                     
@@ -401,6 +522,9 @@ const ChatInterface = {
         });
     }
 };
+
+// Expose ChatInterface to window for inline onclick handlers
+window.ChatInterface = ChatInterface;
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {

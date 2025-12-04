@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Save Recipe</title>
+    <style>
+        body { font-family: monospace; padding: 20px; max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px 5px; font-size: 14px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        #log { margin-top: 20px; border: 1px solid #ccc; padding: 10px; min-height: 200px; }
+        .log-entry { margin: 5px 0; padding: 5px; border-left: 3px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Recipe Save Debugging Tool</h1>
+    
+    <div>
+        <h2>Step 1: Test API Connection</h2>
+        <button onclick="testAPI()">Test API Endpoint</button>
+    </div>
+    
+    <div>
+        <h2>Step 2: Save Test Recipe</h2>
+        <button onclick="saveTestRecipe()">Save Test Recipe</button>
+    </div>
+    
+    <div>
+        <h2>Step 3: Check LocalStorage</h2>
+        <button onclick="checkLocalStorage()">View LocalStorage</button>
+        <button onclick="clearLocalStorage()" style="background: #ff4444; color: white;">Clear LocalStorage</button>
+    </div>
+    
+    <div id="log"></div>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            logDiv.appendChild(entry);
+            console.log(message);
+        }
+        
+        function testAPI() {
+            log('🔵 Testing API endpoint...', 'info');
+            
+            fetch('api/save_ai_recipe.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    title: 'API Test Recipe',
+                    cuisine: 'italian',
+                    ingredients: 'tomato\nonion\ngarlic',
+                    steps: 'Step 1: Chop\nStep 2: Cook\nStep 3: Serve'
+                })
+            })
+            .then(response => {
+                log(`📡 Response Status: ${response.status}`, 'info');
+                return response.json();
+            })
+            .then(data => {
+                log('✅ API Response: ' + JSON.stringify(data, null, 2), 'success');
+                alert('API Test Successful!\n\n' + JSON.stringify(data, null, 2));
+            })
+            .catch(error => {
+                log('❌ API Error: ' + error.message, 'error');
+                alert('API Test Failed:\n' + error.message);
+            });
+        }
+        
+        function saveTestRecipe() {
+            log('🔵 Saving test recipe...', 'info');
+            
+            const testRecipe = {
+                title: 'Debug Test Recipe ' + Date.now(),
+                cuisine: 'other',
+                ingredients: 'Ingredient 1\nIngredient 2\nIngredient 3',
+                steps: 'Step 1: First step\nStep 2: Second step\nStep 3: Third step'
+            };
+            
+            log('📤 Sending: ' + JSON.stringify(testRecipe, null, 2), 'info');
+            
+            fetch('api/save_ai_recipe.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(testRecipe)
+            })
+            .then(response => {
+                log(`📡 Response Status: ${response.status}`, 'info');
+                return response.json();
+            })
+            .then(data => {
+                log('📥 Server Response: ' + JSON.stringify(data, null, 2), 'success');
+                
+                if (data.success && data.mode === 'local') {
+                    log('💾 Mode: LOCAL - Saving to localStorage', 'info');
+                    
+                    const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+                    localRecipes.push({
+                        id: data.recipe_id,
+                        ...data.recipe
+                    });
+                    localStorage.setItem('local_recipes', JSON.stringify(localRecipes));
+                    
+                    log(`✅ Saved to localStorage! Total recipes: ${localRecipes.length}`, 'success');
+                    alert(`✅ Recipe saved successfully!\n\nRecipe ID: ${data.recipe_id}\nMode: ${data.mode}\nTotal recipes in storage: ${localRecipes.length}`);
+                } else if (data.success) {
+                    log('💾 Mode: DATABASE - Saved to database', 'success');
+                    alert(`✅ Recipe saved to database!\n\nRecipe ID: ${data.recipe_id}`);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                log('❌ Error: ' + error.message, 'error');
+                alert('❌ Save Failed:\n' + error.message);
+            });
+        }
+        
+        function checkLocalStorage() {
+            const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+            log(`📦 LocalStorage has ${localRecipes.length} recipes`, 'info');
+            
+            if (localRecipes.length === 0) {
+                alert('📦 No recipes in localStorage');
+            } else {
+                const display = localRecipes.map((r, i) => 
+                    `${i + 1}. ${r.title} (ID: ${r.id})\n   Cuisine: ${r.cuisine || 'N/A'}`
+                ).join('\n\n');
+                
+                alert(`📦 Recipes in LocalStorage (${localRecipes.length}):\n\n${display}`);
+                log('📋 Recipes:\n' + display, 'info');
+            }
+        }
+        
+        function clearLocalStorage() {
+            if (confirm('⚠️ Clear all recipes from localStorage?')) {
+                localStorage.removeItem('local_recipes');
+                log('🗑️ LocalStorage cleared', 'info');
+                alert('✅ LocalStorage cleared!');
+            }
+        }
+        
+        // Initial status check
+        log('🟢 Debugging tool loaded', 'success');
+        log('🌐 Current URL: ' + window.location.href, 'info');
+    </script>
+</body>
+</html>
+

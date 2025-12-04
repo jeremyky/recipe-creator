@@ -66,7 +66,7 @@ $last_cuisine = $last_cuisine ?? '';
               <?php endif; ?>
             </div>
             <div class="card-header">
-              <h3><?= h($recipe['title']) ?></h3>
+              <h3 class="recipe-title"><?= h($recipe['title']) ?></h3>
               <p class="text-small">
                 <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
                 <span class="chip chip-primary" style="margin-left: 8px;"><?= intval($recipe['ingredient_count']) ?> ingredients</span>
@@ -84,7 +84,31 @@ $last_cuisine = $last_cuisine ?? '';
   <script>
   // Load and display localStorage recipes (for local testing)
   (function() {
-    const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+    let localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+    
+    // Clean up malformed recipes (titles that contain full recipe text)
+    let needsCleanup = false;
+    localRecipes = localRecipes.map(recipe => {
+      // If title is suspiciously long or contains CUISINE/INGREDIENTS/STEPS, extract just the title
+      if (recipe.title && (recipe.title.length > 200 || recipe.title.includes('CUISINE:') || recipe.title.includes('INGREDIENTS:'))) {
+        needsCleanup = true;
+        
+        // Try to extract just the title part
+        const titleMatch = recipe.title.match(/^([^C]+?)(?:CUISINE:|INGREDIENTS:|STEPS:|$)/);
+        if (titleMatch) {
+          const cleanTitle = titleMatch[1].trim();
+          console.log(`🧹 Cleaning recipe title: "${recipe.title.substring(0, 50)}..." → "${cleanTitle}"`);
+          return { ...recipe, title: cleanTitle };
+        }
+      }
+      return recipe;
+    });
+    
+    // Save cleaned recipes back to localStorage
+    if (needsCleanup) {
+      localStorage.setItem('local_recipes', JSON.stringify(localRecipes));
+      console.log('✅ Cleaned up malformed recipe titles in localStorage');
+    }
     
     if (localRecipes.length > 0) {
       const container = document.getElementById('local-recipes-container');
@@ -124,7 +148,7 @@ $last_cuisine = $last_cuisine ?? '';
               <span style="font-size: 64px; opacity: 0.3;">🍳</span>
             </div>
             <div class="card-header">
-              <h3>${escapeHtml(recipe.title)}</h3>
+              <h3 class="recipe-title">${escapeHtml(recipe.title)}</h3>
               <p class="text-small">
                 ${createdDate} • 
                 <span class="chip chip-primary" style="margin-left: 8px;">${ingredientCount} ingredients</span>
@@ -157,15 +181,22 @@ $last_cuisine = $last_cuisine ?? '';
       const recipe = localRecipes.find(r => r.id === recipeId);
       
       if (recipe) {
-        // Show recipe in modal or alert
+        // Create a modal or detailed view
         const ingredients = recipe.ingredients.split('\n').map(i => `• ${i}`).join('\n');
         const steps = recipe.steps.split('\n').map((s, i) => `${i + 1}. ${s}`).join('\n');
         
-        alert(`📖 ${recipe.title}\n\n` +
+        const message = `📖 ${recipe.title}\n\n` +
               `🍽️ Cuisine: ${recipe.cuisine || 'Not specified'}\n\n` +
               `📝 INGREDIENTS:\n${ingredients}\n\n` +
               `👨‍🍳 STEPS:\n${steps}\n\n` +
-              `💡 This recipe is stored locally in your browser for testing.`);
+              `💡 This recipe is stored locally in your browser.\n\n` +
+              `Click OK to edit this recipe.`;
+        
+        if (confirm(message)) {
+          // Redirect to edit page with local recipe data
+          sessionStorage.setItem('editLocalRecipe', JSON.stringify(recipe));
+          window.location.href = `index.php?action=recipe_edit&id=${recipeId}`;
+        }
       }
     };
   })();

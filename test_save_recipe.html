@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Save Recipe</title>
+</head>
+<body>
+    <h1>Test Recipe Save</h1>
+    <button onclick="testSave()">Test Save</button>
+    <div id="results"></div>
+    
+    <script>
+        function testSave() {
+            console.log('Testing save recipe API...');
+            document.getElementById('results').innerHTML = 'Testing...';
+            
+            fetch('api/save_ai_recipe.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    title: 'Test Recipe',
+                    cuisine: 'italian',
+                    ingredients: 'tomato\nonion\ngarlic',
+                    steps: 'Step 1\nStep 2\nStep 3'
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log('Response:', data);
+                document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                if (data.mode === 'local') {
+                    // Try to save to localStorage
+                    const localRecipes = JSON.parse(localStorage.getItem('local_recipes') || '[]');
+                    localRecipes.push({
+                        id: data.recipe_id,
+                        ...data.recipe
+                    });
+                    localStorage.setItem('local_recipes', JSON.stringify(localRecipes));
+                    
+                    alert('Saved! Check localStorage - local_recipes key has ' + localRecipes.length + ' recipes');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('results').innerHTML = 'Error: ' + err.message;
+            });
+        }
+    </script>
+</body>
+</html>
