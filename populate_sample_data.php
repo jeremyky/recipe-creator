@@ -13,7 +13,7 @@ echo "🌱 Populating Sample Data...\n\n";
 require __DIR__ . '/lib/db.php';
 
 try {
-    $pdo = db_connect();
+$pdo = db_connect();
 } catch (Exception $e) {
     $pdo = null;
 }

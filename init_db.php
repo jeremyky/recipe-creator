@@ -65,9 +65,19 @@ $sql_statements = [
       line TEXT NOT NULL
     )",
     
+    "CREATE TABLE IF NOT EXISTS favorite (
+      id SERIAL PRIMARY KEY,
+      user_id INT REFERENCES app_user(id) ON DELETE CASCADE,
+      recipe_id INT REFERENCES recipe(id) ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE(user_id, recipe_id)
+    )",
+    
     "CREATE INDEX IF NOT EXISTS idx_recipe_user_id ON recipe(user_id)",
     "CREATE INDEX IF NOT EXISTS idx_pantry_user_id ON pantry_item(user_id)",
     "CREATE INDEX IF NOT EXISTS idx_recipe_ingredient_recipe_id ON recipe_ingredient(recipe_id)",
+    "CREATE INDEX IF NOT EXISTS idx_favorite_user_id ON favorite(user_id)",
+    "CREATE INDEX IF NOT EXISTS idx_favorite_recipe_id ON favorite(recipe_id)",
     
     "ALTER TABLE recipe ADD COLUMN IF NOT EXISTS cuisine TEXT",
     

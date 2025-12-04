@@ -1680,6 +1680,60 @@ select {
   animation: fadeIn 0.5s ease-out;
 }
 
+/* ===== FAVORITE BUTTON ===== */
+.favorite-btn {
+  transition: all 0.2s ease;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-btn:active {
+  transform: scale(0.95);
+}
+
+.favorite-btn.is-favorite {
+  background: rgba(255, 215, 0, 0.2) !important;
+  border-color: #FFD700 !important;
+}
+
+/* Favorited recipe cards get subtle highlight */
+.recipe-card:has(.favorite-btn.is-favorite) {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--color-bg-elevated), var(--color-bg-elevated)) padding-box,
+              linear-gradient(135deg, #FFD700, #FFA500) border-box;
+}
+
+/* Recipe filters form styling */
+#recipe-filters-form label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+#recipe-filters-form input[type="search"],
+#recipe-filters-form select {
+  width: 100%;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.recipe-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
 /* ===== ENHANCED FOCUS STATES ===== */
 input:focus,
 select:focus,

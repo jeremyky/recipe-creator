@@ -145,22 +145,28 @@ switch ($action) {
     
     case 'recipes':
         require_auth();
-        // Handle cuisine filter cookie (state management)
-        if (isset($_GET['cuisine'])) {
-            setcookie('last_cuisine', $_GET['cuisine'], time() + 60 * 60 * 24 * 30, '/');
-        }
-        $last_cuisine = $_COOKIE['last_cuisine'] ?? '';
         
+        // Build filters array from query parameters
         $filters = [];
+        
         if (!empty($_GET['search'])) {
-            $filters['q'] = $_GET['search'];
+            $filters['search'] = $_GET['search'];
         }
+        
         if (!empty($_GET['cuisine'])) {
             $filters['cuisine'] = $_GET['cuisine'];
         }
         
+        if (!empty($_GET['favorites_only'])) {
+            $filters['favorites_only'] = true;
+        }
+        
+        if (!empty($_GET['sort'])) {
+            $filters['sort'] = $_GET['sort'];
+        }
+        
         $recipes = get_recipes(user_id(), $filters);
-        render('recipes', ['recipes' => $recipes, 'last_cuisine' => $last_cuisine]);
+        render('recipes', ['recipes' => $recipes]);
         break;
     
     case 'upload':
@@ -407,7 +413,7 @@ switch ($action) {
         }
         
         // Validate CSRF
-        if (!csrf_check($_POST['csrf'] ?? '')) {
+        if (!verify_csrf($_POST['csrf'] ?? '')) {
             flash('error', 'Invalid CSRF token');
             redirect('index.php?action=recipe_edit&id=' . $recipeId);
         }
@@ -452,22 +458,6 @@ switch ($action) {
             'steps' => $steps
         ]);
         
-        // Check if this is a local recipe (for local testing)
-        $db = db();
-        if (!$db && strpos($recipeId, 'local_') === 0) {
-            // Handle local recipe update via session flag
-            $_SESSION['local_recipe_update'] = [
-                'id' => $recipeId,
-                'title' => $title,
-                'cuisine' => $cuisine,
-                'image_url' => $image,
-                'ingredients' => $ingredients,
-                'steps' => $steps
-            ];
-            flash('success', 'Recipe updated! (Local testing mode - update localStorage via JavaScript)');
-            redirect('index.php?action=recipe_detail&id=' . $recipeId);
-        }
-        
         if ($updated) {
             flash('success', 'Recipe updated successfully!');
             redirect('index.php?action=recipe_detail&id=' . $recipeId);
@@ -498,7 +488,7 @@ switch ($action) {
         }
         
         // Validate CSRF
-        if (!csrf_check($_POST['csrf'] ?? '')) {
+        if (!verify_csrf($_POST['csrf'] ?? '')) {
             flash('error', 'Invalid CSRF token');
             redirect('index.php?action=recipe_detail&id=' . $recipeId);
         }

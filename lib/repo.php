@@ -19,19 +19,63 @@ function get_recipes($userId, $filters = []) {
         return []; // Return empty array if no database connection
     }
     
-    $sql = "SELECT r.*, COUNT(ri.id) as ingredient_count
+    $sql = "SELECT r.*, 
+                   COUNT(ri.id) as ingredient_count,
+                   CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_favorite
             FROM recipe r
             LEFT JOIN recipe_ingredient ri ON r.id = ri.recipe_id
+            LEFT JOIN favorite f ON r.id = f.recipe_id AND f.user_id = :user_id
             WHERE r.user_id = :user_id";
     
     $params = ['user_id' => $userId];
     
-    if (!empty($filters['q'])) {
-        $sql .= " AND r.title ILIKE :search";
-        $params['search'] = '%' . $filters['q'] . '%';
+    // Search filter (title or ingredients)
+    if (!empty($filters['search'])) {
+        $sql .= " AND (r.title ILIKE :search OR EXISTS (
+                    SELECT 1 FROM recipe_ingredient ri2 
+                    WHERE ri2.recipe_id = r.id AND ri2.line ILIKE :search
+                  ))";
+        $params['search'] = '%' . $filters['search'] . '%';
     }
     
-    $sql .= " GROUP BY r.id ORDER BY r.created_at DESC";
+    // Cuisine filter
+    if (!empty($filters['cuisine'])) {
+        $sql .= " AND r.cuisine = :cuisine";
+        $params['cuisine'] = $filters['cuisine'];
+    }
+    
+    // Favorites only filter
+    if (!empty($filters['favorites_only'])) {
+        $sql .= " AND f.id IS NOT NULL";
+    }
+    
+    $sql .= " GROUP BY r.id, f.id";
+    
+    // Sorting (favorites always first, then apply chosen sort)
+    $sort = $filters['sort'] ?? 'date_desc';
+    $sql .= " ORDER BY is_favorite DESC"; // Favorites first always
+    
+    switch ($sort) {
+        case 'name_asc':
+            $sql .= ", LOWER(r.title) ASC";
+            break;
+        case 'name_desc':
+            $sql .= ", LOWER(r.title) DESC";
+            break;
+        case 'date_asc':
+            $sql .= ", r.created_at ASC";
+            break;
+        case 'ingredients_asc':
+            $sql .= ", COUNT(ri.id) ASC";
+            break;
+        case 'ingredients_desc':
+            $sql .= ", COUNT(ri.id) DESC";
+            break;
+        case 'date_desc':
+        default:
+            $sql .= ", r.created_at DESC";
+            break;
+    }
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -159,25 +203,21 @@ function update_recipe($recipeId, $userId, $data) {
             $stmt = $pdo->prepare("DELETE FROM recipe_ingredient WHERE recipe_id = :recipe_id");
             $stmt->execute(['recipe_id' => $recipeId]);
             
-            // Insert new ingredients
+            // Insert new ingredients (using 'line' column as per schema)
             $ingredientLines = explode("\n", $data['ingredients']);
-            $order = 0;
+            
+            $stmt = $pdo->prepare("
+                INSERT INTO recipe_ingredient (recipe_id, line)
+                VALUES (:recipe_id, :line)
+            ");
             
             foreach ($ingredientLines as $line) {
                 $line = trim($line);
                 if (empty($line)) continue;
                 
-                $order++;
-                
-                $stmt = $pdo->prepare("
-                    INSERT INTO recipe_ingredient (recipe_id, ingredient, ingredient_order)
-                    VALUES (:recipe_id, :ingredient, :order)
-                ");
-                
                 $stmt->execute([
                     'recipe_id' => $recipeId,
-                    'ingredient' => $line,
-                    'order' => $order
+                    'line' => $line
                 ]);
             }
         }

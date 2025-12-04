@@ -27,15 +27,18 @@ $ingredients = $ingredients ?? [];
       </p>
     </div>
     
-    <div style="display: flex; gap: var(--space-m); margin-top: var(--space-xl); flex-wrap: wrap;">
-      <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" class="btn-primary">
-        👨‍🍳 Start Cooking
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-l); margin-top: var(--space-xl);">
+      <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" class="btn-primary" style="padding: var(--space-l) var(--space-xl); font-size: 1.1rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: var(--space-s);">
+        <span style="font-size: 1.5rem;">👨‍🍳</span>
+        <span>Start Cooking</span>
       </a>
-      <a href="index.php?action=recipe_edit&id=<?= $recipe['id'] ?>" class="btn-secondary">
-        ✏️ Edit Recipe
+      <a href="index.php?action=recipe_edit&id=<?= $recipe['id'] ?>" class="btn-secondary" style="padding: var(--space-l) var(--space-xl); font-size: 1.1rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: var(--space-s);">
+        <span style="font-size: 1.5rem;">✏️</span>
+        <span>Edit Recipe</span>
       </a>
-      <button onclick="confirmDeleteRecipe('<?= $recipe['id'] ?>', '<?= h(addslashes($recipe['title'])) ?>')" class="btn-ghost" style="color: var(--color-danger);">
-        🗑️ Delete
+      <button onclick="confirmDeleteRecipe('<?= $recipe['id'] ?>', '<?= h(addslashes($recipe['title'])) ?>')" class="btn-ghost" style="padding: var(--space-l) var(--space-xl); font-size: 1.1rem; font-weight: 600; color: var(--color-danger); text-align: center; display: flex; align-items: center; justify-content: center; gap: var(--space-s);">
+        <span style="font-size: 1.5rem;">🗑️</span>
+        <span>Delete</span>
       </button>
     </div>
   </header>
