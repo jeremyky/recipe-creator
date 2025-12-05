@@ -45,16 +45,14 @@ $ingredients = $ingredients ?? [];
           <span>Start Cooking</span>
         </a>
         <a href="index.php?action=recipe_edit&id=<?= $recipe['id'] ?>" 
-           style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: #6366f1; border: 1.5px solid rgba(99, 102, 241, 0.4); border-radius: 12px; text-decoration: none; transition: all 0.2s ease;"
-           onmouseover="this.style.background='rgba(99, 102, 241, 0.08)'; this.style.borderColor='#6366f1';"
-           onmouseout="this.style.background='white'; this.style.borderColor='rgba(99, 102, 241, 0.4)';">
+           class="btn-edit-recipe"
+           style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--color-bg-elevated); color: var(--color-primary); border: 1.5px solid rgba(99, 102, 241, 0.4); border-radius: 12px; text-decoration: none; transition: all 0.2s ease;">
           <span style="font-size: 20px; line-height: 1;">✏️</span>
           <span>Edit</span>
         </a>
         <button onclick="confirmDeleteRecipe('<?= $recipe['id'] ?>', '<?= h(addslashes($recipe['title'])) ?>')" 
-                style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; color: #b23a48; border: 1.5px solid rgba(231, 111, 81, 0.4); background: white; border-radius: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s ease; font-family: inherit;"
-                onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='#e76f51';"
-                onmouseout="this.style.background='white'; this.style.borderColor='rgba(231, 111, 81, 0.4)';">
+                class="btn-delete-recipe"
+                style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; color: var(--color-danger); border: 1.5px solid rgba(239, 68, 68, 0.4); background: var(--color-bg-elevated); border-radius: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">
           <span style="font-size: 20px; line-height: 1;">🗑️</span>
           <span>Delete</span>
         </button>
@@ -183,6 +181,55 @@ $ingredients = $ingredients ?? [];
 
 .step-content {
   line-height: 1.6;
+}
+
+/* Edit button - dark mode compatible */
+.btn-edit-recipe {
+  color: var(--color-primary) !important;
+  background: var(--color-bg-elevated) !important;
+  border: 1.5px solid rgba(99, 102, 241, 0.4) !important;
+}
+
+.btn-edit-recipe:hover {
+  background: var(--color-primary-soft) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Delete button - dark mode compatible */
+.btn-delete-recipe {
+  color: var(--color-danger) !important;
+  background: var(--color-bg-elevated) !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-delete-recipe:hover {
+  background: var(--color-danger-soft) !important;
+  border-color: var(--color-danger) !important;
+  color: var(--color-danger) !important;
+}
+
+/* Ensure text and icons are visible in dark mode - brighter colors */
+body.dark-mode .btn-edit-recipe,
+body.dark-mode .btn-edit-recipe span {
+  color: #a5b4fc !important;
+}
+
+body.dark-mode .btn-edit-recipe:hover {
+  background: var(--color-primary-soft) !important;
+  border-color: #a5b4fc !important;
+  color: #a5b4fc !important;
+}
+
+body.dark-mode .btn-delete-recipe,
+body.dark-mode .btn-delete-recipe span {
+  color: #f87171 !important;
+}
+
+body.dark-mode .btn-delete-recipe:hover {
+  background: var(--color-danger-soft) !important;
+  border-color: #f87171 !important;
+  color: #f87171 !important;
 }
 </style>
 

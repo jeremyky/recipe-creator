@@ -108,9 +108,46 @@ function register_user($name, $email, $password) {
     } catch (PDOException $e) {
         error_log("Registration failed for $email: " . $e->getMessage());
         
-        // Check if it's a duplicate email error
-        if (strpos($e->getMessage(), 'duplicate key') !== false || 
-            strpos($e->getMessage(), 'already exists') !== false) {
+        // Check if it's a sequence sync issue (duplicate key on primary key)
+        if (strpos($e->getMessage(), 'duplicate key') !== false && 
+            strpos($e->getMessage(), 'app_user_pkey') !== false) {
+            // Sequence is out of sync - fix it and retry
+            try {
+                // Get max ID from table
+                $stmt = $pdo->query('SELECT COALESCE(MAX(id), 0) as max_id FROM app_user');
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $max_id = (int)$result['max_id'];
+                
+                // Reset sequence to max_id (next insert will use max_id + 1)
+                $pdo->exec("SELECT setval('app_user_id_seq', $max_id, true)");
+                
+                error_log("Fixed user sequence: reset to $max_id");
+                
+                // Retry the insert
+                $stmt = $pdo->prepare('
+                    INSERT INTO app_user (name, email, password_hash, created_at) 
+                    VALUES (:name, :email, :password_hash, NOW())
+                ');
+                
+                $stmt->execute([
+                    'name' => $name,
+                    'email' => $email,
+                    'password_hash' => $password_hash
+                ]);
+                
+                $user_id = $pdo->lastInsertId();
+                return ['success' => true, 'user_id' => $user_id];
+            } catch (PDOException $e3) {
+                error_log("Registration failed after sequence fix: " . $e3->getMessage());
+                return ['success' => false, 'error' => 'Registration failed: ' . $e3->getMessage()];
+            }
+        }
+        
+        // Check if it's a duplicate email error (unique constraint on email)
+        if ((strpos($e->getMessage(), 'duplicate key') !== false && 
+             strpos($e->getMessage(), 'app_user_email_key') !== false) ||
+            (strpos($e->getMessage(), 'already exists') !== false && 
+             strpos($e->getMessage(), 'email') !== false)) {
             return ['success' => false, 'error' => 'Email already registered'];
         }
         
@@ -130,6 +167,34 @@ function register_user($name, $email, $password) {
                 $user_id = $pdo->lastInsertId();
                 return ['success' => true, 'user_id' => $user_id];
             } catch (PDOException $e2) {
+                // Also check for sequence issue in fallback
+                if (strpos($e2->getMessage(), 'duplicate key') !== false && 
+                    strpos($e2->getMessage(), 'app_user_pkey') !== false) {
+                    try {
+                        // Fix sequence and retry
+                        $stmt = $pdo->query('SELECT COALESCE(MAX(id), 0) as max_id FROM app_user');
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $max_id = (int)$result['max_id'];
+                        $pdo->exec("SELECT setval('app_user_id_seq', $max_id, true)");
+                        
+                        // Retry insert
+                        $stmt = $pdo->prepare('
+                            INSERT INTO app_user (email, password_hash, created_at) 
+                            VALUES (:email, :password_hash, NOW())
+                        ');
+                        
+                        $stmt->execute([
+                            'email' => $email,
+                            'password_hash' => $password_hash
+                        ]);
+                        
+                        $user_id = $pdo->lastInsertId();
+                        return ['success' => true, 'user_id' => $user_id];
+                    } catch (PDOException $e4) {
+                        return ['success' => false, 'error' => 'Registration failed: ' . $e4->getMessage()];
+                    }
+                }
+                
                 return ['success' => false, 'error' => 'Registration failed: ' . $e2->getMessage()];
             }
         }
@@ -472,6 +537,49 @@ function find_or_create_google_user($google_user) {
     } catch (PDOException $e) {
         error_log("Failed to create Google user: " . $e->getMessage());
         
+        // Check if it's a duplicate key error (sequence out of sync)
+        if (strpos($e->getMessage(), 'duplicate key') !== false && 
+            strpos($e->getMessage(), 'app_user_pkey') !== false) {
+            // Sequence is out of sync - fix it and retry
+            try {
+                // Get max ID from table
+                $stmt = $pdo->query('SELECT COALESCE(MAX(id), 0) as max_id FROM app_user');
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $max_id = (int)$result['max_id'];
+                
+                // Reset sequence to max_id (next insert will use max_id + 1)
+                $pdo->exec("SELECT setval('app_user_id_seq', $max_id, true)");
+                
+                error_log("Fixed user sequence: reset to $max_id");
+                
+                // Retry the insert
+                $stmt = $pdo->prepare('
+                    INSERT INTO app_user (name, email, password_hash, created_at) 
+                    VALUES (:name, :email, NULL, NOW())
+                    RETURNING id, name, email, created_at
+                ');
+                
+                $stmt->execute([
+                    'name' => $name,
+                    'email' => $email
+                ]);
+                
+                $user = $stmt->fetch();
+                
+                if (!$user) {
+                    $user_id = $pdo->lastInsertId();
+                    $stmt = $pdo->prepare('SELECT * FROM app_user WHERE id = :id');
+                    $stmt->execute(['id' => $user_id]);
+                    $user = $stmt->fetch();
+                }
+                
+                return ['success' => true, 'user' => $user, 'is_new' => true];
+            } catch (PDOException $e3) {
+                error_log("Failed to create Google user after sequence fix: " . $e3->getMessage());
+                return ['success' => false, 'error' => 'Failed to create user account: ' . $e3->getMessage()];
+            }
+        }
+        
         // Check if name column doesn't exist - fallback to insert without it
         if (strpos($e->getMessage(), 'column "name"') !== false) {
             try {
@@ -495,6 +603,40 @@ function find_or_create_google_user($google_user) {
                 return ['success' => true, 'user' => $user, 'is_new' => true];
             } catch (PDOException $e2) {
                 error_log("Failed to create Google user (fallback): " . $e2->getMessage());
+                
+                // Also check for sequence issue in fallback
+                if (strpos($e2->getMessage(), 'duplicate key') !== false && 
+                    strpos($e2->getMessage(), 'app_user_pkey') !== false) {
+                    try {
+                        // Fix sequence and retry
+                        $stmt = $pdo->query('SELECT COALESCE(MAX(id), 0) as max_id FROM app_user');
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $max_id = (int)$result['max_id'];
+                        $pdo->exec("SELECT setval('app_user_id_seq', $max_id, true)");
+                        
+                        // Retry insert
+                        $stmt = $pdo->prepare('
+                            INSERT INTO app_user (email, password_hash, created_at) 
+                            VALUES (:email, NULL, NOW())
+                            RETURNING id, email, created_at
+                        ');
+                        
+                        $stmt->execute(['email' => $email]);
+                        $user = $stmt->fetch();
+                        
+                        if (!$user) {
+                            $user_id = $pdo->lastInsertId();
+                            $stmt = $pdo->prepare('SELECT * FROM app_user WHERE id = :id');
+                            $stmt->execute(['id' => $user_id]);
+                            $user = $stmt->fetch();
+                        }
+                        
+                        return ['success' => true, 'user' => $user, 'is_new' => true];
+                    } catch (PDOException $e4) {
+                        return ['success' => false, 'error' => 'Failed to create user account: ' . $e4->getMessage()];
+                    }
+                }
+                
                 return ['success' => false, 'error' => 'Failed to create user account: ' . $e2->getMessage()];
             }
         }

@@ -610,6 +610,12 @@ switch ($action) {
         render('about');
         break;
     
+    // Admin/utility pages
+    case 'fix_sequence':
+        // Fix user ID sequence (no auth required for utility script)
+        include __DIR__ . '/fix_user_sequence.php';
+        exit;
+    
     default:
         http_response_code(404);
         echo "Page not found";

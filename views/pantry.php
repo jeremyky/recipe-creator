@@ -467,55 +467,91 @@ style.textContent = `
   }
   
   /* Remove button - red outline block with lighter red fill */
-  .remove-btn {
-    color: #dc2626;
-    background-color: #fee2e2;
-    border: 1.5px solid #dc2626;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    height: 36px;
-    min-width: 90px;
-    font-family: inherit;
+  button.remove-btn,
+  .remove-btn,
+  form.delete-form button[type="submit"] {
+    color: #dc2626 !important;
+    background-color: #fee2e2 !important;
+    border: 1.5px solid #dc2626 !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    height: 36px !important;
+    min-width: 90px !important;
+    font-family: inherit !important;
+    min-height: auto !important;
+    box-shadow: none !important;
   }
   
-  .remove-btn span:first-child {
-    font-size: 1rem;
-    line-height: 1;
+  /* Force red text on all spans */
+  button.remove-btn span,
+  .remove-btn span {
+    color: #dc2626 !important;
   }
   
-  .remove-btn:hover {
-    background-color: #fecaca;
-    color: #dc2626;
-    border-color: #dc2626;
-    transform: translateY(-1px);
+  button.remove-btn span:first-child {
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    color: #dc2626 !important;
   }
   
+  button.remove-btn span:last-child {
+    font-size: 0.875rem !important;
+    color: #dc2626 !important;
+  }
+  
+  button.remove-btn:hover,
+  .remove-btn:hover,
+  form.delete-form button[type="submit"]:hover {
+    background-color: #fecaca !important;
+    color: #dc2626 !important;
+    border-color: #dc2626 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: none !important;
+  }
+  
+  button.remove-btn:active,
   .remove-btn:active {
-    transform: translateY(0);
+    transform: translateY(0) !important;
   }
   
-  /* Dark mode adjustments */
+  /* Dark mode adjustments - bright red text */
+  body.dark-mode button.remove-btn,
   body.dark-mode .remove-btn,
+  body.dark-mode button.remove-btn span,
+  body.dark-mode .remove-btn span,
+  html[data-theme="dark"] button.remove-btn,
   html[data-theme="dark"] .remove-btn,
+  html[data-theme="dark"] button.remove-btn span,
+  html[data-theme="dark"] .remove-btn span,
   @media (prefers-color-scheme: dark) {
-    .remove-btn {
-      color: #fca5a5;
-      background-color: rgba(220, 38, 38, 0.15);
-      border-color: #fca5a5;
+    button.remove-btn,
+    .remove-btn,
+    button.remove-btn span,
+    .remove-btn span {
+      color: #ef4444 !important;
     }
     
-    .remove-btn:hover {
-      background-color: rgba(220, 38, 38, 0.25);
-      color: #fca5a5;
-      border-color: #fca5a5;
+    button.remove-btn,
+    .remove-btn {
+      background-color: rgba(220, 38, 38, 0.15) !important;
+      border-color: #ef4444 !important;
+    }
+    
+    button.remove-btn:hover,
+    .remove-btn:hover,
+    button.remove-btn:hover span,
+    .remove-btn:hover span {
+      background-color: rgba(220, 38, 38, 0.25) !important;
+      color: #ef4444 !important;
+      border-color: #ef4444 !important;
     }
   }
 `;

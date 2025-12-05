@@ -106,13 +106,22 @@ $ingredients = $ingredients ?? [];
   position: relative;
   width: 22px;
   height: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  aspect-ratio: 1;
   margin-right: 1rem;
   cursor: pointer;
   appearance: none;
+  -webkit-appearance: none;
   border: 2px solid var(--color-border-strong);
   border-radius: 6px;
   background: white;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  flex-grow: 0;
+  box-sizing: border-box;
 }
 
 .checkbox-item input[type="checkbox"]:hover {
@@ -177,18 +186,32 @@ $ingredients = $ingredients ?? [];
   border-color: var(--color-success);
 }
 
+.step-checkbox {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+}
+
 .step-checkbox input[type="checkbox"] {
   position: relative;
   width: 22px;
   height: 22px;
   min-width: 22px;
+  max-width: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  aspect-ratio: 1;
   cursor: pointer;
   appearance: none;
+  -webkit-appearance: none;
   border: 2px solid var(--color-border-strong);
   border-radius: 6px;
   background: white;
   transition: all 0.2s ease;
   margin-top: 0.25rem;
+  flex-shrink: 0;
+  flex-grow: 0;
+  box-sizing: border-box;
 }
 
 .step-checkbox input[type="checkbox"]:hover {

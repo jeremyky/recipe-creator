@@ -645,18 +645,91 @@ body.light-mode .card:not(.recipe-card) {
 }
 
 /* Primary Button */
-.btn-primary, button[type="submit"] {
+.btn-primary, button[type="submit"]:not(.remove-btn) {
   background: var(--color-primary);
   color: white !important;
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.btn-primary:hover, button[type="submit"]:hover {
+.btn-primary:hover, button[type="submit"]:not(.remove-btn):hover {
   background: var(--color-primary-dark);
   color: white !important;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   transform: translateY(-1px);
+}
+
+/* Remove button - red outline block with red text */
+button.remove-btn,
+.remove-btn,
+form.delete-form button.remove-btn {
+  color: #dc2626 !important;
+  background-color: #fee2e2 !important;
+  border: 1.5px solid #dc2626 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  box-shadow: none !important;
+}
+
+button.remove-btn:hover,
+.remove-btn:hover,
+form.delete-form button.remove-btn:hover {
+  background-color: #fecaca !important;
+  color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+
+/* Ensure all text inside button is red */
+button.remove-btn,
+button.remove-btn span,
+.remove-btn,
+.remove-btn span {
+  color: #dc2626 !important;
+}
+
+/* Dark mode - bright red text for visibility */
+body.dark-mode button.remove-btn,
+body.dark-mode .remove-btn,
+body.dark-mode button.remove-btn span,
+body.dark-mode .remove-btn span,
+html[data-theme="dark"] button.remove-btn,
+html[data-theme="dark"] .remove-btn,
+html[data-theme="dark"] button.remove-btn span,
+html[data-theme="dark"] .remove-btn span {
+  color: #ef4444 !important;
+}
+
+body.dark-mode button.remove-btn,
+body.dark-mode .remove-btn,
+html[data-theme="dark"] button.remove-btn,
+html[data-theme="dark"] .remove-btn {
+  background-color: rgba(220, 38, 38, 0.15) !important;
+  border-color: #ef4444 !important;
+}
+
+body.dark-mode button.remove-btn:hover,
+body.dark-mode .remove-btn:hover,
+body.dark-mode button.remove-btn:hover span,
+body.dark-mode .remove-btn:hover span,
+html[data-theme="dark"] button.remove-btn:hover,
+html[data-theme="dark"] .remove-btn:hover,
+html[data-theme="dark"] button.remove-btn:hover span,
+html[data-theme="dark"] .remove-btn:hover span {
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+body.dark-mode button.remove-btn:hover,
+body.dark-mode .remove-btn:hover,
+html[data-theme="dark"] button.remove-btn:hover,
+html[data-theme="dark"] .remove-btn:hover {
+  background-color: rgba(220, 38, 38, 0.25) !important;
 }
 
 .btn-primary:active, button[type="submit"]:active {
