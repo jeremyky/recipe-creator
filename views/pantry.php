@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Pantry - Recipe Creator';
+$page_title = 'Pantry - Pantry Pilot';
 $current_page = 'pantry';
 $items = $items ?? [];
 $old = $old ?? [];

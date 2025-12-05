@@ -1,6 +1,6 @@
 <?php
 /**
- * Front controller for Recipe Creator
+ * Front controller for Pantry Pilot
  * Deployed URL: https://cs4640.cs.virginia.edu/juh7hc/
  * Authors: Jeremy Ky, Ashley Wu, Shaunak Sinha
  * CS 4640 Sprint 4
@@ -127,7 +127,7 @@ switch ($action) {
         // Auto-login after registration
         login_user($result['user_id']);
         
-        flash('success', 'Account created successfully! Welcome to Recipe Creator!');
+        flash('success', 'Account created successfully! Welcome to Pantry Pilot!');
         redirect('index.php?action=home');
         break;
     
@@ -175,7 +175,7 @@ switch ($action) {
         
         // Set welcome message
         if ($result['is_new_user']) {
-            flash('success', 'Welcome to Recipe Creator! Your account has been created.');
+            flash('success', 'Welcome to Pantry Pilot! Your account has been created.');
         } else {
             flash('success', 'Welcome back, ' . htmlspecialchars($result['user']['name']) . '!');
         }

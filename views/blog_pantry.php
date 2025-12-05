@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <title>10 Tips to Maximize Your Pantry Efficiency - Recipe Creator Blog</title>
+  <title>10 Tips to Maximize Your Pantry Efficiency - Pantry Pilot Blog</title>
   <link rel="stylesheet" href="assets/landing.css">
   <link rel="stylesheet" href="assets/blog.css">
 </head>
@@ -15,7 +15,7 @@
       <div class="nav-logo">
         <a href="index.php" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.5rem;">
           <span class="logo-icon">🍳</span>
-          <span class="logo-text">Recipe Creator</span>
+          <span class="logo-text">Pantry Pilot</span>
         </a>
       </div>
       
@@ -38,7 +38,7 @@
           <span>•</span>
           <span>⏱️ 5 min read</span>
           <span>•</span>
-          <span>✍️ Recipe Creator Team</span>
+          <span>✍️ Pantry Pilot Team</span>
         </div>
       </div>
     </div>
@@ -59,7 +59,7 @@
         <p>FIFO stands for "First In, First Out." When you buy new items, place them behind the older ones. This ensures you're always using the oldest products first, reducing the chance of food expiring before you use it.</p>
 
         <h2>4. Keep a Running Inventory</h2>
-        <p>Maintain a digital list on your phone or use Recipe Creator's built-in pantry tracker. Update it whenever you use or buy items. This eliminates the guesswork when you're at the grocery store and prevents overbuying.</p>
+        <p>Maintain a digital list on your phone or use Pantry Pilot's built-in pantry tracker. Update it whenever you use or buy items. This eliminates the guesswork when you're at the grocery store and prevents overbuying.</p>
 
         <h2>5. Maximize Vertical Space</h2>
         <p>Don't waste valuable vertical space! Use shelf risers, stackable bins, or tiered organizers to create multiple levels within your pantry. This can effectively double your storage capacity.</p>
@@ -74,10 +74,10 @@
         <p>Set a recurring reminder to check your pantry once a month. Move items that are expiring soon to the front, and update your inventory. This 15-minute task can save you hundreds of dollars annually.</p>
 
         <h2>9. Create a "Use First" Zone</h2>
-        <p>Designate one shelf or basket as your "use first" area. Place items nearing expiration here, and make a conscious effort to incorporate them into your meals. Recipe Creator's smart matching can help you find recipes specifically designed to use these ingredients.</p>
+        <p>Designate one shelf or basket as your "use first" area. Place items nearing expiration here, and make a conscious effort to incorporate them into your meals. Pantry Pilot's smart matching can help you find recipes specifically designed to use these ingredients.</p>
 
-        <h2>10. Go Digital With Recipe Creator</h2>
-        <p>While physical organization is crucial, digital tracking takes it to the next level. Recipe Creator automatically reminds you when items are running low, suggests recipes based on what you have, and helps you plan meals around expiring ingredients. It's like having a personal pantry manager!</p>
+        <h2>10. Go Digital With Pantry Pilot</h2>
+        <p>While physical organization is crucial, digital tracking takes it to the next level. Pantry Pilot automatically reminds you when items are running low, suggests recipes based on what you have, and helps you plan meals around expiring ingredients. It's like having a personal pantry manager!</p>
 
         <div class="article-callout">
           <h3>💡 Pro Tip</h3>
@@ -87,11 +87,11 @@
         <h2>The Bottom Line</h2>
         <p>An organized pantry isn't about perfection—it's about functionality. Start with one or two of these tips, and gradually implement more as you develop new habits. The goal is to create a system that works for your lifestyle and helps you waste less, save more, and cook better meals.</p>
 
-        <p>With these strategies and Recipe Creator's smart pantry tracking, you'll always know what you have, what you need, and what delicious meals you can create right now.</p>
+        <p>With these strategies and Pantry Pilot's smart pantry tracking, you'll always know what you have, what you need, and what delicious meals you can create right now.</p>
 
         <div class="article-cta">
           <h3>Ready to transform your pantry?</h3>
-          <p>Join thousands of home cooks using Recipe Creator to reduce waste and cook smarter.</p>
+          <p>Join thousands of home cooks using Pantry Pilot to reduce waste and cook smarter.</p>
           <a href="index.php?action=signup" class="btn btn-primary btn-lg">Get Started Free</a>
         </div>
       </div>
@@ -100,8 +100,8 @@
 
   <footer class="blog-footer">
     <div class="container">
-      <p><a href="index.php#blog">← Back to Blog</a> | <a href="index.php">Recipe Creator Home</a></p>
-      <p style="margin-top: 1rem; color: var(--text-tertiary);">&copy; 2025 Recipe Creator. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
+      <p><a href="index.php#blog">← Back to Blog</a> | <a href="index.php">Pantry Pilot Home</a></p>
+      <p style="margin-top: 1rem; color: var(--text-tertiary);">&copy; 2025 Pantry Pilot. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
     </div>
   </footer>
 

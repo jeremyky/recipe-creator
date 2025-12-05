@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Chat Search - Recipe Creator';
+$page_title = 'Chat Search - Pantry Pilot';
 $current_page = 'chat';
 ?>
 

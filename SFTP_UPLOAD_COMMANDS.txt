@@ -1,4 +1,4 @@
-# SFTP Upload Commands for Recipe Creator
+# SFTP Upload Commands for Pantry Pilot
 # Connect first: sftp juh7hc@cs4640.cs.virginia.edu
 # Then run these commands:
 

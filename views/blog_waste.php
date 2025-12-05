@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <title>Reducing Food Waste: A Complete Guide - Recipe Creator Blog</title>
+  <title>Reducing Food Waste: A Complete Guide - Pantry Pilot Blog</title>
   <link rel="stylesheet" href="assets/landing.css">
   <link rel="stylesheet" href="assets/blog.css">
 </head>
@@ -15,7 +15,7 @@
       <div class="nav-logo">
         <a href="index.php" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.5rem;">
           <span class="logo-icon">🍳</span>
-          <span class="logo-text">Recipe Creator</span>
+          <span class="logo-text">Pantry Pilot</span>
         </a>
       </div>
       
@@ -38,7 +38,7 @@
           <span>•</span>
           <span>⏱️ 8 min read</span>
           <span>•</span>
-          <span>✍️ Recipe Creator Sustainability Team</span>
+          <span>✍️ Pantry Pilot Sustainability Team</span>
         </div>
       </div>
     </div>
@@ -63,7 +63,7 @@
         <p>Waste reduction starts before you even enter the grocery store:</p>
         
         <h3>Check Your Pantry First</h3>
-        <p>Always check what you already have before shopping. Recipe Creator makes this easy with our mobile-friendly pantry view—pull it up while standing in your kitchen and at the store. You'd be surprised how often we buy duplicates of items hiding in the back of the fridge.</p>
+        <p>Always check what you already have before shopping. Pantry Pilot makes this easy with our mobile-friendly pantry view—pull it up while standing in your kitchen and at the store. You'd be surprised how often we buy duplicates of items hiding in the back of the fridge.</p>
 
         <h3>Make a List and Stick to It</h3>
         <p>Impulse purchases are the enemy of food waste reduction. Plan your meals for the week, create a shopping list based on those meals, and resist the temptation to deviate. That interesting-looking exotic fruit? If you don't have a specific plan for it, leave it at the store.</p>
@@ -75,7 +75,7 @@
         <p>Counter-intuitive, but smaller, more frequent shopping trips often result in less waste. Fresh produce lasts longer when it hasn't been sitting in your fridge for a week before you use it.</p>
 
         <h2>Master the Art of "Rescue Cooking"</h2>
-        <p>This is where Recipe Creator really shines. Rescue cooking means using ingredients before they go bad:</p>
+        <p>This is where Pantry Pilot really shines. Rescue cooking means using ingredients before they go bad:</p>
 
         <div class="article-callout">
           <h3>Common Rescue Scenarios</h3>
@@ -88,7 +88,7 @@
           </ul>
         </div>
 
-        <p>Recipe Creator's "use it up" feature specifically finds recipes designed to rescue ingredients. Just select what's about to expire, and we'll show you recipes that prioritize those items.</p>
+        <p>Pantry Pilot's "use it up" feature specifically finds recipes designed to rescue ingredients. Just select what's about to expire, and we'll show you recipes that prioritize those items.</p>
 
         <h2>Proper Storage is Everything</h2>
         <p>Storing food correctly can double or triple its lifespan:</p>
@@ -149,7 +149,7 @@
         <p>No yard? Many cities now offer compost pickup services, or consider a countertop composter.</p>
 
         <h2>Track and Learn</h2>
-        <p>Recipe Creator's expiration tracking helps you:</p>
+        <p>Pantry Pilot's expiration tracking helps you:</p>
         <ul>
           <li>Get alerted 3 days before items expire</li>
           <li>See which foods you waste most often</li>
@@ -180,13 +180,13 @@
         <h2>The Bottom Line</h2>
         <p>Reducing food waste isn't about perfection—it's about progress. Every meal you make from ingredients you already have is a small victory for your budget and the planet. Every vegetable you rescue from the brink is food that serves its purpose instead of becoming trash.</p>
 
-        <p>Start small, build habits, and use tools like Recipe Creator to make it easier. Your wallet, your schedule, and your conscience will thank you.</p>
+        <p>Start small, build habits, and use tools like Pantry Pilot to make it easier. Your wallet, your schedule, and your conscience will thank you.</p>
 
         <p>Remember: the most sustainable food is the food you already have. Use it wisely, waste it rarely, and enjoy every bite.</p>
 
         <div class="article-cta">
           <h3>Ready to Cut Your Food Waste in Half?</h3>
-          <p>Recipe Creator helps you track expiration dates, plan meals around what you have, and never waste food again.</p>
+          <p>Pantry Pilot helps you track expiration dates, plan meals around what you have, and never waste food again.</p>
           <a href="index.php?action=signup" class="btn btn-primary btn-lg">Start Reducing Waste Today</a>
         </div>
       </div>
@@ -195,8 +195,8 @@
 
   <footer class="blog-footer">
     <div class="container">
-      <p><a href="index.php#blog">← Back to Blog</a> | <a href="index.php">Recipe Creator Home</a></p>
-      <p style="margin-top: 1rem; color: var(--text-tertiary);">&copy; 2025 Recipe Creator. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
+      <p><a href="index.php#blog">← Back to Blog</a> | <a href="index.php">Pantry Pilot Home</a></p>
+      <p style="margin-top: 1rem; color: var(--text-tertiary);">&copy; 2025 Pantry Pilot. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
     </div>
   </footer>
 

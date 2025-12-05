@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Match from Fridge - Recipe Creator';
+$page_title = 'Match from Fridge - Pantry Pilot';
 $current_page = 'match';
 $recipes = $recipes ?? [];
 $max_missing = $max_missing ?? 3;

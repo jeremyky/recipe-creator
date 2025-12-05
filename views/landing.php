@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Recipe Creator - Transform your pantry into delicious meals with AI-powered recipe suggestions">
+  <meta name="description" content="Pantry Pilot - Transform your pantry into delicious meals with AI-powered recipe suggestions">
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <title>Recipe Creator - Your Smart Kitchen Companion</title>
+  <title>Pantry Pilot - Your Smart Kitchen Companion</title>
   <link rel="stylesheet" href="assets/landing.css">
 </head>
 <body class="light-mode">
@@ -14,7 +14,7 @@
     <div class="nav-container">
       <div class="nav-logo">
         <span class="logo-icon">🍳</span>
-        <span class="logo-text">Recipe Creator</span>
+        <span class="logo-text">Pantry Pilot</span>
       </div>
       
       <div class="nav-links">
@@ -39,7 +39,7 @@
     <div class="hero-container">
       <div class="hero-content">
         <h1 class="hero-title">Transform Your Pantry Into <span class="highlight">Delicious Meals</span></h1>
-        <p class="hero-subtitle">Never waste food again. Recipe Creator uses AI to match your ingredients with perfect recipes, track your pantry, and guide you through cooking.</p>
+        <p class="hero-subtitle">Never waste food again. Pantry Pilot uses AI to match your ingredients with perfect recipes, track your pantry, and guide you through cooking.</p>
         <div class="hero-cta">
           <a href="index.php?action=signup" class="btn btn-primary btn-lg">Start Cooking Free</a>
           <a href="#how-it-works" class="btn btn-secondary btn-lg">See How It Works</a>
@@ -118,7 +118,7 @@
   <!-- How It Works -->
   <section id="how-it-works" class="how-it-works">
     <div class="container">
-      <h2 class="section-title">How Recipe Creator Works</h2>
+      <h2 class="section-title">How Pantry Pilot Works</h2>
       <p class="section-subtitle">From pantry to plate in three simple steps</p>
       
       <div class="steps">
@@ -156,12 +156,12 @@
   <section id="faq" class="faq">
     <div class="container">
       <h2 class="section-title">Frequently Asked Questions</h2>
-      <p class="section-subtitle">Everything you need to know about Recipe Creator</p>
+      <p class="section-subtitle">Everything you need to know about Pantry Pilot</p>
       
       <div class="faq-grid">
         <div class="faq-item">
-          <h3>How does Recipe Creator work?</h3>
-          <p>Recipe Creator connects your pantry inventory with our extensive recipe database. When you add ingredients to your pantry, our AI-powered matching system instantly finds recipes you can make. The more you add, the more personalized your recommendations become. You can also chat with our AI assistant for cooking tips and recipe suggestions.</p>
+          <h3>How does Pantry Pilot work?</h3>
+          <p>Pantry Pilot connects your pantry inventory with our extensive recipe database. When you add ingredients to your pantry, our AI-powered matching system instantly finds recipes you can make. The more you add, the more personalized your recommendations become. You can also chat with our AI assistant for cooking tips and recipe suggestions.</p>
         </div>
         
         <div class="faq-item">
@@ -175,13 +175,13 @@
         </div>
         
         <div class="faq-item">
-          <h3>How is Recipe Creator useful?</h3>
-          <p>Recipe Creator helps you reduce food waste, save money on groceries, and discover new recipes using ingredients you already have. It takes the guesswork out of meal planning by showing you exactly what you can make right now. Users report saving 20-30% on grocery bills and reducing food waste by 50%.</p>
+          <h3>How is Pantry Pilot useful?</h3>
+          <p>Pantry Pilot helps you reduce food waste, save money on groceries, and discover new recipes using ingredients you already have. It takes the guesswork out of meal planning by showing you exactly what you can make right now. Users report saving 20-30% on grocery bills and reducing food waste by 50%.</p>
         </div>
         
         <div class="faq-item">
-          <h3>Can I use Recipe Creator on mobile?</h3>
-          <p>Yes! Recipe Creator is fully responsive and works perfectly on phones, tablets, and desktops. Access your pantry and recipes from anywhere. We also have native mobile apps coming soon for iOS and Android.</p>
+          <h3>Can I use Pantry Pilot on mobile?</h3>
+          <p>Yes! Pantry Pilot is fully responsive and works perfectly on phones, tablets, and desktops. Access your pantry and recipes from anywhere. We also have native mobile apps coming soon for iOS and Android.</p>
         </div>
         
         <div class="faq-item">
@@ -206,7 +206,7 @@
           <div class="blog-content">
             <span class="blog-tag">Getting Started</span>
             <h3>10 Tips to Maximize Your Pantry Efficiency</h3>
-            <p>Ever opened your pantry only to discover expired items hiding in the back? You're not alone. A well-organized pantry isn't just aesthetically pleasing—it's a money-saver and time-saver. Start by categorizing items by type (grains, canned goods, spices) and using clear containers so you can see what you have at a glance. Place newer items behind older ones (first-in, first-out method) and keep a running inventory list on your phone. Consider adding shelf risers to maximize vertical space and lazy Susans for corner cabinets. Label everything with purchase or expiration dates, and do a monthly audit to move soon-to-expire items to the front. With Recipe Creator's smart pantry tracking, you'll get automatic reminders when items are running low, helping you avoid both waste and last-minute grocery runs. Remember: a visible pantry is a usable pantry!</p>
+            <p>Ever opened your pantry only to discover expired items hiding in the back? You're not alone. A well-organized pantry isn't just aesthetically pleasing—it's a money-saver and time-saver. Start by categorizing items by type (grains, canned goods, spices) and using clear containers so you can see what you have at a glance. Place newer items behind older ones (first-in, first-out method) and keep a running inventory list on your phone. Consider adding shelf risers to maximize vertical space and lazy Susans for corner cabinets. Label everything with purchase or expiration dates, and do a monthly audit to move soon-to-expire items to the front. With Pantry Pilot's smart pantry tracking, you'll get automatic reminders when items are running low, helping you avoid both waste and last-minute grocery runs. Remember: a visible pantry is a usable pantry!</p>
             <a href="index.php?action=blog_pantry" class="blog-link">Read More →</a>
           </div>
         </article>
@@ -230,7 +230,7 @@
           <div class="blog-content">
             <span class="blog-tag">Sustainability</span>
             <h3>Reducing Food Waste: A Complete Guide</h3>
-            <p>Did you know that the average household throws away $1,500 worth of food each year? Food waste isn't just an environmental issue—it's draining your wallet. The solution starts with mindful shopping: always check your pantry before heading to the store (Recipe Creator makes this easy with our mobile-friendly pantry view). Buy only what you need and plan meals around ingredients you already have. Master the art of "rescue cooking"—that slightly wilted spinach? Perfect for a frittata. Overripe bananas? Banana bread time. Leftover rice? Fried rice tomorrow. Store produce properly: keep herbs in water like flowers, wrap leafy greens in damp towels, and never store tomatoes in the fridge. Freeze what you can't use immediately—bread, stock, even cheese can be frozen. Use Recipe Creator's expiration tracking to get alerted before items go bad, and try our "use it up" feature to find recipes specifically designed to rescue ingredients. Every meal you make from what you have is a small victory for your budget and the planet.</p>
+            <p>Did you know that the average household throws away $1,500 worth of food each year? Food waste isn't just an environmental issue—it's draining your wallet. The solution starts with mindful shopping: always check your pantry before heading to the store (Pantry Pilot makes this easy with our mobile-friendly pantry view). Buy only what you need and plan meals around ingredients you already have. Master the art of "rescue cooking"—that slightly wilted spinach? Perfect for a frittata. Overripe bananas? Banana bread time. Leftover rice? Fried rice tomorrow. Store produce properly: keep herbs in water like flowers, wrap leafy greens in damp towels, and never store tomatoes in the fridge. Freeze what you can't use immediately—bread, stock, even cheese can be frozen. Use Pantry Pilot's expiration tracking to get alerted before items go bad, and try our "use it up" feature to find recipes specifically designed to rescue ingredients. Every meal you make from what you have is a small victory for your budget and the planet.</p>
             <a href="index.php?action=blog_waste" class="blog-link">Read More →</a>
           </div>
         </article>
@@ -252,7 +252,7 @@
     <div class="footer-container">
       <div class="footer-grid">
         <div class="footer-col">
-          <h4>Recipe Creator</h4>
+          <h4>Pantry Pilot</h4>
           <p>Your intelligent kitchen companion for reducing food waste and discovering delicious recipes.</p>
           <div class="social-links">
             <a href="https://youtube.com/@recipecreator" target="_blank" aria-label="YouTube">
@@ -320,7 +320,7 @@
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; 2025 Recipe Creator. All rights reserved. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
+        <p>&copy; 2025 Pantry Pilot. All rights reserved. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
       </div>
     </div>
   </footer>

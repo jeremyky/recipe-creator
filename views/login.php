@@ -13,7 +13,7 @@ if (!function_exists('csrf_token')) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <title>Sign In - Recipe Creator</title>
+  <title>Sign In - Pantry Pilot</title>
   <link rel="stylesheet" href="assets/auth.css">
 </head>
 <body>
@@ -22,7 +22,7 @@ if (!function_exists('csrf_token')) {
       <div class="auth-header">
         <a href="index.php" class="back-link">← Back to home</a>
         <h1>Welcome back</h1>
-        <p>Sign in to your Recipe Creator account</p>
+        <p>Sign in to your Pantry Pilot account</p>
       </div>
       
       <?php if (isset($flash['error'])): ?>
@@ -102,7 +102,7 @@ if (!function_exists('csrf_token')) {
     <div class="auth-info">
       <div class="info-content">
         <h2>🍳 Cook Smarter, Waste Less</h2>
-        <p>Join thousands of home cooks using Recipe Creator to:</p>
+        <p>Join thousands of home cooks using Pantry Pilot to:</p>
         <ul>
           <li>✨ Match recipes with your pantry ingredients</li>
           <li>📦 Track your food inventory</li>

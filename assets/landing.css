@@ -547,6 +547,43 @@ body {
   opacity: 0.9;
 }
 
+/* CTA button - make it stand out against purple background */
+.cta .btn-primary,
+.cta .btn-primary.btn-lg {
+  background: white !important;
+  color: var(--primary) !important;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  border: 2px solid white !important;
+}
+
+.cta .btn-primary:hover,
+.cta .btn-primary.btn-lg:hover {
+  background: #f9fafb !important;
+  color: var(--primary-dark) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-color: #f9fafb !important;
+}
+
+/* CTA button - make it stand out against purple background */
+.cta .btn-primary {
+  background: white;
+  color: var(--primary);
+  font-weight: 700;
+  padding: 1.25rem 3rem;
+  font-size: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 2px solid white;
+}
+
+.cta .btn-primary:hover {
+  background: #f9fafb;
+  color: var(--primary-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
 /* Footer */
 .landing-footer {
   background-color: var(--bg-secondary);

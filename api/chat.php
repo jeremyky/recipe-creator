@@ -140,12 +140,12 @@ if (!empty($recipes)) {
 }
 
 // Build system prompt with app-specific knowledge
-$system_prompt = "You are an AI cooking assistant integrated into the Recipe Creator app. You have access to the user's pantry inventory and their saved recipes.\n\n" .
+$system_prompt = "You are an AI cooking assistant integrated into the Pantry Pilot app. You have access to the user's pantry inventory and their saved recipes.\n\n" .
     
     "YOUR KNOWLEDGE:\n" .
     "- You can see what ingredients the user currently has in their pantry\n" .
     "- You know which recipes they've already saved in their collection\n" .
-    "- You understand the Recipe Creator app has features like: Recipe Matcher (finds recipes based on pantry), Pantry Management, Recipe Upload, and Cooking Mode\n\n" .
+    "- You understand the Pantry Pilot app has features like: Recipe Matcher (finds recipes based on pantry), Pantry Management, Recipe Upload, and Cooking Mode\n\n" .
     
     "WHEN PROVIDING RECIPES:\n" .
     "If the user asks for a recipe or you want to suggest one, format it EXACTLY like this:\n\n" .

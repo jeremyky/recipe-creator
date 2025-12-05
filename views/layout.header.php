@@ -9,14 +9,15 @@ CS 4640 Sprint 4
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <meta name="author" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <meta name="description" content="Create, manage, and cook recipes with AI-powered assistance">
+  <meta name="description" content="Reduce food waste by matching recipes with your pantry ingredients. AI-powered recipe suggestions and smart ingredient matching.">
   <meta name="theme-color" content="#6366f1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Recipe Creator">
-  <title><?= h($page_title ?? 'Recipe Creator') ?></title>
+  <meta name="apple-mobile-web-app-title" content="Pantry Pilot">
+  <title><?= h($page_title ?? 'Pantry Pilot') ?></title>
   <link rel="stylesheet" href="assets/styles.css">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <script>
     // Set initial theme before page loads to prevent flash
@@ -34,7 +35,7 @@ CS 4640 Sprint 4
     <div class="navbar-inner">
       <a href="index.php" class="brand">
         <span class="brand-icon">🍳</span>
-        <span class="brand-text">Recipe Creator</span>
+        <span class="brand-text">Pantry Pilot</span>
       </a>
       
       <!-- Mobile Menu Toggle -->

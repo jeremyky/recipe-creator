@@ -13,7 +13,7 @@ if (!function_exists('csrf_token')) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <title>Sign Up - Recipe Creator</title>
+  <title>Sign Up - Pantry Pilot</title>
   <link rel="stylesheet" href="assets/auth.css">
 </head>
 <body>
@@ -22,7 +22,7 @@ if (!function_exists('csrf_token')) {
       <div class="auth-header">
         <a href="index.php" class="back-link">← Back to home</a>
         <h1>Get started free</h1>
-        <p>Create your Recipe Creator account</p>
+        <p>Create your Pantry Pilot account</p>
       </div>
       
       <?php if (isset($flash['error'])): ?>

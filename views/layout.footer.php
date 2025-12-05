@@ -4,7 +4,7 @@
     <div class="container">
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; text-align: left;">
         <div>
-          <h4 style="margin: 0 0 1rem; color: var(--text); font-size: 1.1rem;">Recipe Creator</h4>
+          <h4 style="margin: 0 0 1rem; color: var(--text); font-size: 1.1rem;">Pantry Pilot</h4>
           <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
             Your intelligent kitchen companion for reducing food waste and discovering delicious recipes.
           </p>
@@ -29,7 +29,7 @@
       </div>
       <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem; text-align: center;">
         <p style="color: var(--muted); font-size: 0.9rem; margin: 0 0 0.5rem;">
-          Recipe Creator • CS 4640 Sprint 4
+          Pantry Pilot • CS 4640 Sprint 4
         </p>
         <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">
           <a href="#main" style="color: var(--accent); text-decoration: none;">Back to top</a> • 

@@ -1,5 +1,5 @@
 <?php
-$page_title = ($recipe['title'] ?? 'Recipe') . ' - Recipe Creator';
+$page_title = ($recipe['title'] ?? 'Recipe') . ' - Pantry Pilot';
 $current_page = 'recipes';
 $recipe = $recipe ?? [];
 $ingredients = $ingredients ?? [];

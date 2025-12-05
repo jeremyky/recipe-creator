@@ -1,7 +1,7 @@
 {
-  "name": "Recipe Creator",
-  "short_name": "RecipeApp",
-  "description": "Create, manage, and cook recipes with AI-powered assistance",
+  "name": "Pantry Pilot",
+  "short_name": "PantryPilot",
+  "description": "Reduce food waste by matching recipes with your pantry ingredients",
   "start_url": "/juh7hc/index.php?action=home",
   "display": "standalone",
   "background_color": "#020617",

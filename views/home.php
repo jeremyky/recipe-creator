@@ -1,10 +1,10 @@
 <?php
-$page_title = 'Recipe Creator - Landing';
+$page_title = 'Pantry Pilot - Landing';
 $current_page = 'home';
 ?>
 
 <div class="section-header">
-  <h1 id="hero-heading">Welcome to Recipe Creator</h1>
+  <h1 id="hero-heading">Welcome to Pantry Pilot</h1>
   <p>Keep track of what's in your kitchen and find recipes that work with your ingredients. No more wasted food or last-minute grocery runs.</p>
 </div>
 

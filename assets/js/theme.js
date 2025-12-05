@@ -1,5 +1,5 @@
 /**
- * Theme toggle functionality for Recipe Creator app
+ * Theme toggle functionality for Pantry Pilot app
  * Authors: Jeremy Ky, Ashley Wu, Shaunak Sinha
  * CS 4640 Sprint 4
  */

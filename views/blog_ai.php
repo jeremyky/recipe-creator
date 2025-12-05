@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
-  <title>How to Get Better AI Recipe Recommendations - Recipe Creator Blog</title>
+  <title>How to Get Better AI Recipe Recommendations - Pantry Pilot Blog</title>
   <link rel="stylesheet" href="assets/landing.css">
   <link rel="stylesheet" href="assets/blog.css">
 </head>
@@ -15,7 +15,7 @@
       <div class="nav-logo">
         <a href="index.php" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.5rem;">
           <span class="logo-icon">🍳</span>
-          <span class="logo-text">Recipe Creator</span>
+          <span class="logo-text">Pantry Pilot</span>
         </a>
       </div>
       
@@ -38,7 +38,7 @@
           <span>•</span>
           <span>⏱️ 6 min read</span>
           <span>•</span>
-          <span>✍️ Recipe Creator AI Team</span>
+          <span>✍️ Pantry Pilot AI Team</span>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
         <p class="lead">Getting generic recipe suggestions that don't match your style? Your AI is only as smart as the data you give it. Let's change that and unlock truly personalized recommendations.</p>
 
         <h2>Understanding How the AI Learns</h2>
-        <p>Recipe Creator's AI uses machine learning to understand your preferences, cooking habits, and ingredient availability. Every interaction you have—searching, rating, favoriting, or even skipping recipes—teaches the system more about you. The key is being intentional with these interactions.</p>
+        <p>Pantry Pilot's AI uses machine learning to understand your preferences, cooking habits, and ingredient availability. Every interaction you have—searching, rating, favoriting, or even skipping recipes—teaches the system more about you. The key is being intentional with these interactions.</p>
 
         <h2>Rate Recipes Honestly</h2>
         <p>This is the single most important thing you can do. When you make a recipe, rate it honestly on a 1-5 star scale. The AI uses these ratings to understand what you like:</p>
@@ -151,7 +151,7 @@
 
         <div class="article-cta">
           <h3>Experience AI-Powered Cooking</h3>
-          <p>Join Recipe Creator and get personalized recipe recommendations tailored to your taste.</p>
+          <p>Join Pantry Pilot and get personalized recipe recommendations tailored to your taste.</p>
           <a href="index.php?action=signup" class="btn btn-primary btn-lg">Start Your Free Trial</a>
         </div>
       </div>
@@ -160,8 +160,8 @@
 
   <footer class="blog-footer">
     <div class="container">
-      <p><a href="index.php#blog">← Back to Blog</a> | <a href="index.php">Recipe Creator Home</a></p>
-      <p style="margin-top: 1rem; color: var(--text-tertiary);">&copy; 2025 Recipe Creator. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
+      <p><a href="index.php#blog">← Back to Blog</a> | <a href="index.php">Pantry Pilot Home</a></p>
+      <p style="margin-top: 1rem; color: var(--text-tertiary);">&copy; 2025 Pantry Pilot. Jeremy Ky, Ashley Wu, and Shaunak Sinha.</p>
     </div>
   </footer>
 

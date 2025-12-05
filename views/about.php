@@ -1,15 +1,15 @@
 <?php
-$page_title = 'About - Recipe Creator';
+$page_title = 'About - Pantry Pilot';
 $current_page = 'about';
 ?>
 
-<h1>About Recipe Creator</h1>
+<h1>About Pantry Pilot</h1>
 <p class="lead">Your intelligent kitchen companion for reducing food waste and discovering delicious recipes.</p>
 
 <section aria-labelledby="mission-heading">
   <h2 id="mission-heading">Our Mission</h2>
   <div class="card">
-    <p>Recipe Creator was born from a simple observation: too much food goes to waste because people don't know what to cook with what they have. We believe that everyone should be able to create delicious meals from the ingredients already in their kitchen.</p>
+    <p>Pantry Pilot was born from a simple observation: too much food goes to waste because people don't know what to cook with what they have. We believe that everyone should be able to create delicious meals from the ingredients already in their kitchen.</p>
     <p>Our platform helps you:</p>
     <ul style="line-height: 2;">
       <li>Track ingredients in your pantry</li>
@@ -75,7 +75,7 @@ $current_page = 'about';
 <section aria-labelledby="vision-heading" style="margin-top: 2rem;">
   <h2 id="vision-heading">Our Vision</h2>
   <div class="card">
-    <p>We envision a world where no food goes to waste and everyone can confidently cook delicious meals. Recipe Creator is just the beginning. We're continuously working to add new features, improve our matching algorithms, and expand our recipe database.</p>
+    <p>We envision a world where no food goes to waste and everyone can confidently cook delicious meals. Pantry Pilot is just the beginning. We're continuously working to add new features, improve our matching algorithms, and expand our recipe database.</p>
     <p style="margin-top: 1rem;"><strong>Join us in making cooking more accessible, sustainable, and enjoyable for everyone.</strong></p>
   </div>
 </section>

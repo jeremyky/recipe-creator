@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Upload Recipe - Recipe Creator';
+$page_title = 'Upload Recipe - Pantry Pilot';
 $current_page = 'upload';
 $old = $old ?? [];
 $errors = $flash['errors'] ?? [];

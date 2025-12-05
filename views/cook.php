@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Cook & History - Recipe Creator';
+$page_title = 'Cook & History - Pantry Pilot';
 $current_page = 'cook';
 $recipes = $recipes ?? [];
 ?>
