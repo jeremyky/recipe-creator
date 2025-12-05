@@ -51,12 +51,12 @@ body.light-mode {
   --radius-m: 12px;
   --radius-l: 16px;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(15, 23, 42, 0.08);
-  --shadow-card: 0 4px 20px rgba(15, 23, 42, 0.10);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  /* Shadows - very light and subtle for white mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.01);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.06), 0 3px 8px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.02);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.1);
   
   /* Container */
   --max-width: 1200px;
@@ -93,11 +93,12 @@ body.dark-mode {
   --color-danger-soft: rgba(239, 68, 68, 0.15);
   --color-info-soft: rgba(14, 165, 233, 0.15);
   
-  /* Shadows (lighter in dark mode) */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+  /* Shadows (subtle in dark mode) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.25);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
 }
 
 /* Legacy variable mapping for backwards compatibility */
@@ -466,7 +467,7 @@ h3 {
 
 .grid-3 {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-xl);
+  gap: calc(var(--space-xl) * 0.9); /* Reduce by 10% */
 }
 
 .grid-4 {
@@ -517,6 +518,43 @@ h3 {
   transform: translateY(-2px);
   border-color: var(--color-primary-soft);
   cursor: pointer;
+}
+
+/* Light mode: modern layered shadows for recipe cards */
+body.light-mode .recipe-card {
+  background: #fdfdfd;
+  border: 1px solid #f1f1f1;
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+/* Hover effects only on desktop (no hover on mobile) */
+@media (hover: hover) and (pointer: fine) {
+  body.light-mode .recipe-card:hover {
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.12),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    border-color: #e5e5e5;
+  }
+}
+
+/* Ensure recipe cards maintain rounded corners */
+.recipe-card {
+  border-radius: 16px !important;
+}
+
+/* Regular cards in light mode */
+body.light-mode .card:not(.recipe-card) {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body.light-mode .card:not(.recipe-card):hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
 }
 
 .card:hover::before {
@@ -573,7 +611,7 @@ h3 {
   align-items: center;
   justify-content: center;
   font-size: 48px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-image img {
@@ -611,7 +649,7 @@ h3 {
   background: var(--color-primary);
   color: white !important;
   border: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .btn-primary:hover, button[type="submit"]:hover {
@@ -623,7 +661,7 @@ h3 {
 
 .btn-primary:active, button[type="submit"]:active {
   transform: translateY(0);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 /* Secondary Button */
@@ -631,7 +669,7 @@ h3 {
   background: var(--color-bg);
   color: var(--color-text-main) !important;
   border: 2px solid var(--color-border-strong);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .btn-secondary:hover, .btn-outline:hover {
@@ -891,7 +929,7 @@ details form select {
 
 details:hover {
   border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 details[open] {
@@ -1003,10 +1041,14 @@ details[open] > summary {
   cursor: pointer;
   padding: 0 !important;
   overflow: hidden;
+  border-radius: 16px; /* rounded-xl */
 }
 
-.recipe-card:hover {
-  cursor: pointer;
+/* Hover only on desktop */
+@media (hover: hover) and (pointer: fine) {
+  .recipe-card:hover {
+    cursor: pointer;
+  }
 }
 
 .recipe-card a {
@@ -1017,23 +1059,28 @@ details[open] > summary {
 }
 
 .recipe-card .card-header {
-  padding: var(--space-l) var(--space-xl);
+  padding: 18px 20px;
 }
 
 .recipe-card .card-image {
   margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.recipe-img::before {
+.recipe-card .card-image::after {
   content: '';
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6));
+  height: 80px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+  pointer-events: none;
   z-index: 1;
 }
+
+/* Gradient overlay removed - using .card-image::after instead */
 
 .recipe-img img {
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1042,8 +1089,11 @@ details[open] > summary {
   object-fit: cover;
 }
 
-.recipe-card:hover .recipe-img img {
-  transform: scale(1.05);
+/* Image zoom on hover - desktop only */
+@media (hover: hover) and (pointer: fine) {
+  .recipe-card:hover .recipe-img img {
+    transform: scale(1.05);
+  }
 }
 
 .recipe-content {
@@ -1422,7 +1472,7 @@ input[type="range"]::-webkit-slider-thumb {
   border: 3px solid var(--color-bg-elevated);
   border-radius: 50%;
   cursor: grab;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-top: -6px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -1445,7 +1495,7 @@ input[type="range"]::-moz-range-thumb {
   border: 3px solid var(--color-bg-elevated);
   border-radius: 50%;
   cursor: grab;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -1535,7 +1585,7 @@ main {
   text-transform: uppercase;
   font-size: 0.75rem;
   padding: 6px 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: none;
 }
 
@@ -1679,12 +1729,12 @@ select {
   transition: all 0.2s ease;
   background: rgba(255, 255, 255, 0.95) !important;
   border: 2px solid var(--color-border-subtle) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .favorite-btn:hover {
   transform: scale(1.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 1) !important;
 }
 

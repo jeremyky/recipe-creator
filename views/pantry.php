@@ -47,7 +47,7 @@ $errors = $flash['errors'] ?? [];
                    value="<?= h($old['name'] ?? '') ?>" 
                    placeholder="e.g., Chicken Breast" 
                    class="<?= !empty($errors['name']) ? 'error' : '' ?>" 
-                   style="width: 100%; height: 44px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;"
+                   style="width: 100%; height: 44px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.95rem; background: var(--color-bg-elevated); color: var(--color-text-main); transition: all 0.2s ease;"
                    onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)';"
                    onblur="this.style.borderColor='var(--color-border-subtle)'; this.style.boxShadow='none';"
                    required
@@ -74,7 +74,7 @@ $errors = $flash['errors'] ?? [];
                    min="0" step="0.1" 
                    placeholder="2" 
                    class="<?= !empty($errors['quantity']) ? 'error' : '' ?>" 
-                   style="width: 100%; height: 44px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;"
+                   style="width: 100%; height: 44px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.95rem; background: var(--color-bg-elevated); color: var(--color-text-main); transition: all 0.2s ease;"
                    onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)';"
                    onblur="this.style.borderColor='var(--color-border-subtle)'; this.style.boxShadow='none';"
                    required>
@@ -89,7 +89,7 @@ $errors = $flash['errors'] ?? [];
             </label>
             <select id="ingredient-unit" name="unit" 
                     class="<?= !empty($errors['unit']) ? 'error' : '' ?>" 
-                    style="width: 100%; height: 44px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.95rem; background: white; cursor: pointer; transition: all 0.2s ease;"
+                    style="width: 100%; height: 44px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.95rem; background: var(--color-bg-elevated); color: var(--color-text-main); cursor: pointer; transition: all 0.2s ease;"
                     onfocus="this.style.borderColor='var(--color-primary)'; this.style.boxShadow='0 0 0 3px rgba(99, 102, 241, 0.1)';"
                     onblur="this.style.borderColor='var(--color-border-subtle)'; this.style.boxShadow='none';"
                     required>
@@ -127,7 +127,7 @@ $errors = $flash['errors'] ?? [];
           <div class="pantry-chip" 
                data-item-id="<?= $item['id'] ?>"
                style="display: inline-flex; align-items: center; gap: var(--space-xs); padding: 8px 14px; background: var(--color-bg-elevated); border: 1.5px solid var(--color-border-subtle); border-radius: 20px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease;"
-               onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='rgba(99, 102, 241, 0.08)';"
+               onmouseover="this.style.borderColor='var(--color-primary)'; this.style.background='var(--color-primary-soft)';"
                onmouseout="this.style.borderColor='var(--color-border-subtle)'; this.style.background='var(--color-bg-elevated)';"
                onclick="highlightRow(<?= $item['id'] ?>)">
             <span style="font-weight: 600; color: var(--color-text-main);"><?= h($item['ingredient']) ?></span>
@@ -149,20 +149,23 @@ $errors = $flash['errors'] ?? [];
       <div style="display: flex; gap: var(--space-s); flex-wrap: wrap;">
         <input type="text" id="pantry-search" 
                placeholder="🔍 Search ingredients..." 
-               style="height: 40px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.9rem; min-width: 200px;"
+               style="height: 40px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.9rem; min-width: 200px; background: var(--color-bg-elevated); color: var(--color-text-main);"
                oninput="filterTable(this.value)">
         
         <select id="sort-select" 
-                style="height: 40px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.9rem; background: white; cursor: pointer;"
+                style="height: 40px; padding: 0 var(--space-m); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; font-size: 0.9rem; background: var(--color-bg-elevated); color: var(--color-text-main); cursor: pointer;"
                 onchange="sortTable(this.value)">
           <option value="name">Sort by Name</option>
           <option value="recent">Sort by Recently Added</option>
           <option value="quantity">Sort by Quantity</option>
         </select>
         
-        <label style="display: flex; align-items: center; gap: var(--space-xs); padding: 0 var(--space-m); height: 40px; background: var(--color-bg-elevated); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
-          <input type="checkbox" id="low-stock-toggle" onchange="filterLowStock(this.checked)" style="cursor: pointer;">
-          Low Stock
+        <label style="display: flex; align-items: center; gap: 8px; padding: 0 16px; height: 40px; background: var(--color-bg-elevated); border: 1.5px solid var(--color-border-subtle); border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500; color: var(--color-text-main); transition: all 0.2s ease;"
+               onmouseover="this.style.borderColor='var(--color-warning)'; this.style.background='var(--color-warning-soft)';"
+               onmouseout="this.style.borderColor='var(--color-border-subtle)'; this.style.background='var(--color-bg-elevated)';">
+          <input type="checkbox" id="low-stock-toggle" onchange="filterLowStock(this.checked)" 
+                 style="cursor: pointer; width: 18px; height: 18px; accent-color: #f59e0b; margin: 0;">
+          <span>⚠️ Low Stock</span>
         </label>
       </div>
     </div>
@@ -198,10 +201,10 @@ $errors = $flash['errors'] ?? [];
                   <input type="hidden" name="item_id" value="<?= h($item['id']) ?>">
                   <input type="number" name="quantity" value="<?= h($item['quantity']) ?>" 
                          min="0" step="0.1" 
-                         style="width: 70px; height: 36px; padding: 0 var(--space-s); border: 1.5px solid var(--color-border-subtle); border-radius: 6px; font-size: 0.9rem; text-align: center;"
+                         style="width: 70px; height: 36px; padding: 0 var(--space-s); border: 1.5px solid var(--color-border-subtle); border-radius: 6px; font-size: 0.9rem; text-align: center; background: var(--color-bg-elevated); color: var(--color-text-main);"
                          required>
                   <select name="unit" 
-                          style="width: 80px; height: 36px; padding: 0 var(--space-s); border: 1.5px solid var(--color-border-subtle); border-radius: 6px; font-size: 0.9rem; background: white; cursor: pointer;"
+                          style="width: 80px; height: 36px; padding: 0 var(--space-s); border: 1.5px solid var(--color-border-subtle); border-radius: 6px; font-size: 0.9rem; background: var(--color-bg-elevated); color: var(--color-text-main); cursor: pointer;"
                           required>
                     <?php
                     $units = ['lb', 'oz', 'g', 'kg', 'cup', 'tbsp', 'tsp', 'piece', 'ml', 'l', 'fl oz'];
@@ -225,11 +228,10 @@ $errors = $flash['errors'] ?? [];
                   <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
                   <input type="hidden" name="item_id" value="<?= h($item['id']) ?>">
                   <button type="submit" 
-                          style="height: 36px; padding: 0 var(--space-m); background: white; color: #dc2626; border: 1.5px solid #dc2626; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
-                          onmouseover="this.style.background='#dc2626'; this.style.color='white';"
-                          onmouseout="this.style.background='white'; this.style.color='#dc2626';"
+                          class="remove-btn"
                           onclick="return confirm('Remove <?= h(addslashes($item['ingredient'])) ?> from pantry?');">
-                    Remove
+                    <span>🗑️</span>
+                    <span>Remove</span>
                   </button>
                 </form>
               </td>
@@ -322,14 +324,35 @@ function sortTable(sortBy) {
 // Filter low stock items
 function filterLowStock(showOnly) {
   const rows = document.querySelectorAll('.pantry-row');
+  const toggle = document.getElementById('low-stock-toggle');
+  const label = toggle.closest('label');
+  
   rows.forEach(row => {
     const quantity = parseFloat(row.getAttribute('data-quantity'));
     if (showOnly) {
       row.style.display = quantity < 1 ? '' : 'none';
+      // Highlight low stock rows
+      if (quantity < 1) {
+        row.style.background = 'var(--color-warning-soft)';
+        row.style.borderLeft = '4px solid var(--color-warning)';
+      }
     } else {
       row.style.display = '';
+      row.style.background = '';
+      row.style.borderLeft = '';
     }
   });
+  
+  // Update toggle styling
+  if (showOnly) {
+    label.style.background = 'var(--color-warning-soft)';
+    label.style.borderColor = 'var(--color-warning)';
+    label.style.color = 'var(--color-text-main)';
+  } else {
+    label.style.background = 'var(--color-bg-elevated)';
+    label.style.borderColor = 'var(--color-border-subtle)';
+    label.style.color = 'var(--color-text-main)';
+  }
 }
 
 // Auto-fill unit based on ingredient name
@@ -416,7 +439,7 @@ document.querySelectorAll('.delete-form').forEach(form => {
   });
 });
 
-// Add CSS animations
+// Add CSS animations and dark mode fixes
 const style = document.createElement('style');
 style.textContent = `
   @keyframes slideIn {
@@ -441,6 +464,59 @@ style.textContent = `
   }
   .pantry-row:hover {
     background: var(--color-bg) !important;
+  }
+  
+  /* Remove button - red outline block with lighter red fill */
+  .remove-btn {
+    color: #dc2626;
+    background-color: #fee2e2;
+    border: 1.5px solid #dc2626;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    height: 36px;
+    min-width: 90px;
+    font-family: inherit;
+  }
+  
+  .remove-btn span:first-child {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  
+  .remove-btn:hover {
+    background-color: #fecaca;
+    color: #dc2626;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+  }
+  
+  .remove-btn:active {
+    transform: translateY(0);
+  }
+  
+  /* Dark mode adjustments */
+  body.dark-mode .remove-btn,
+  html[data-theme="dark"] .remove-btn,
+  @media (prefers-color-scheme: dark) {
+    .remove-btn {
+      color: #fca5a5;
+      background-color: rgba(220, 38, 38, 0.15);
+      border-color: #fca5a5;
+    }
+    
+    .remove-btn:hover {
+      background-color: rgba(220, 38, 38, 0.25);
+      color: #fca5a5;
+      border-color: #fca5a5;
+    }
   }
 `;
 document.head.appendChild(style);
