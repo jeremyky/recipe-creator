@@ -1,0 +1,47 @@
+# SFTP Upload Commands for Recipe Creator
+# Connect first: sftp juh7hc@cs4640.cs.virginia.edu
+# Then run these commands:
+
+cd public_html
+
+# Remove old index.html if it exists
+rm index.html
+
+# Upload all directories recursively
+put -r api
+put -r assets
+put -r lib
+put -r views
+
+# Upload critical configuration files
+put .env
+put .htaccess
+put manifest.json
+
+# Upload all PHP files in root
+put index.php
+put init_db.php
+put populate_sample_data.php
+put fix_user_sequence.php
+put uploadphp.sql
+
+# Upload all HTML files (if any)
+put chat.html
+put cook.html
+put match.html
+put pantry.html
+put recipes.html
+put upload.html
+
+# Verify .env was uploaded correctly
+ls -la .env
+
+# Verify manifest.json exists
+ls -la manifest.json
+
+# Check that directories were uploaded
+ls -la assets/js/
+
+# Exit SFTP
+exit
+

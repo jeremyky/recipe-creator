@@ -49,6 +49,9 @@
   <!-- Theme toggle (load first) -->
   <script src="assets/js/theme.js"></script>
   
+  <!-- Mobile menu -->
+  <script src="assets/js/mobile-menu.js"></script>
+  
   <!-- Page-specific JavaScript -->
   <?php
   $js_file = 'assets/js/' . ($current_page ?? 'home') . '.js';

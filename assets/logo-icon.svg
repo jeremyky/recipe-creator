@@ -1,0 +1,14 @@
+<svg width="120" height="120" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pan base -->
+  <path d="M5 19C5 15 7 12 11 12H21C25 12 27 15 27 19V21C27 25 25 27 21 27H11C7 27 5 25 5 21V19Z" fill="#6366f1" opacity="0.2"/>
+  <!-- Pan rim -->
+  <path d="M6 20C6 16 8 14 11 14H21C24 14 26 16 26 20V21C26 23 24 25 21 25H11C8 25 6 23 6 21V20Z" fill="#6366f1" opacity="0.4"/>
+  <!-- Pan handle -->
+  <path d="M27 20L30 19V21L27 22V20Z" fill="#6366f1" opacity="0.5"/>
+  <!-- Egg white -->
+  <ellipse cx="16" cy="19" rx="5" ry="4.5" fill="#FFFFFF" opacity="0.95"/>
+  <!-- Egg yolk -->
+  <circle cx="16" cy="19" r="3" fill="#FFD700"/>
+  <circle cx="16" cy="19" r="2" fill="#FFE55C"/>
+</svg>
+
