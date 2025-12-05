@@ -64,7 +64,7 @@ function auth_user() {
     
     if (!$pdo) return null;
     
-    $stmt = $pdo->prepare('SELECT * FROM user WHERE id = :id');
+    $stmt = $pdo->prepare('SELECT * FROM app_user WHERE id = :id');
     $stmt->execute(['id' => $user_id]);
     return $stmt->fetch();
 }
@@ -80,7 +80,7 @@ function register_user($name, $email, $password) {
     }
     
     // Check if email already exists
-    $stmt = $pdo->prepare('SELECT id FROM user WHERE email = :email');
+    $stmt = $pdo->prepare('SELECT id FROM app_user WHERE email = :email');
     $stmt->execute(['email' => $email]);
     if ($stmt->fetch()) {
         return ['success' => false, 'error' => 'Email already registered'];
@@ -89,13 +89,14 @@ function register_user($name, $email, $password) {
     // Hash password
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
     
-    // Insert user
-    $stmt = $pdo->prepare('
-        INSERT INTO user (name, email, password_hash, created_at) 
-        VALUES (:name, :email, :password_hash, NOW())
-    ');
-    
+    // Insert user - check if name column exists
     try {
+        // Try with name column first (for databases that have it)
+        $stmt = $pdo->prepare('
+            INSERT INTO app_user (name, email, password_hash, created_at) 
+            VALUES (:name, :email, :password_hash, NOW())
+        ');
+        
         $stmt->execute([
             'name' => $name,
             'email' => $email,
@@ -105,7 +106,35 @@ function register_user($name, $email, $password) {
         $user_id = $pdo->lastInsertId();
         return ['success' => true, 'user_id' => $user_id];
     } catch (PDOException $e) {
-        return ['success' => false, 'error' => 'Registration failed'];
+        error_log("Registration failed for $email: " . $e->getMessage());
+        
+        // Check if it's a duplicate email error
+        if (strpos($e->getMessage(), 'duplicate key') !== false || 
+            strpos($e->getMessage(), 'already exists') !== false) {
+            return ['success' => false, 'error' => 'Email already registered'];
+        }
+        
+        // Check if name column doesn't exist - fallback to insert without it
+        if (strpos($e->getMessage(), 'column "name"') !== false) {
+            try {
+                $stmt = $pdo->prepare('
+                    INSERT INTO app_user (email, password_hash, created_at) 
+                    VALUES (:email, :password_hash, NOW())
+                ');
+                
+                $stmt->execute([
+                    'email' => $email,
+                    'password_hash' => $password_hash
+                ]);
+                
+                $user_id = $pdo->lastInsertId();
+                return ['success' => true, 'user_id' => $user_id];
+            } catch (PDOException $e2) {
+                return ['success' => false, 'error' => 'Registration failed: ' . $e2->getMessage()];
+            }
+        }
+        
+        return ['success' => false, 'error' => 'Registration failed: ' . $e->getMessage()];
     }
 }
 
@@ -120,7 +149,7 @@ function authenticate_user($email, $password) {
     }
     
     // Get user by email
-    $stmt = $pdo->prepare('SELECT * FROM user WHERE email = :email');
+    $stmt = $pdo->prepare('SELECT * FROM app_user WHERE email = :email');
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch();
     
@@ -252,5 +281,266 @@ function validate_login($data) {
     }
     
     return [$errors, $clean];
+}
+
+/**
+ * ========================================
+ * GOOGLE OAUTH 2.0 FUNCTIONS
+ * ========================================
+ */
+
+/**
+ * Generate Google OAuth authorization URL
+ */
+function google_auth_url() {
+    // Ensure environment variables are loaded
+    load_env();
+    
+    $client_id = $_ENV['GOOGLE_CLIENT_ID'] ?? getenv('GOOGLE_CLIENT_ID');
+    $redirect_uri = $_ENV['GOOGLE_REDIRECT_URI'] ?? getenv('GOOGLE_REDIRECT_URI');
+    
+    // Generate and store state for CSRF protection
+    $state = bin2hex(random_bytes(16));
+    $_SESSION['google_oauth_state'] = $state;
+    
+    $params = [
+        'client_id' => $client_id,
+        'redirect_uri' => $redirect_uri,
+        'response_type' => 'code',
+        'scope' => 'openid email profile',
+        'state' => $state,
+        'access_type' => 'online',
+        'prompt' => 'select_account'
+    ];
+    
+    return 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
+}
+
+/**
+ * Exchange authorization code for tokens
+ */
+function google_exchange_code($code) {
+    // Ensure environment variables are loaded
+    load_env();
+    
+    $client_id = $_ENV['GOOGLE_CLIENT_ID'] ?? getenv('GOOGLE_CLIENT_ID');
+    $client_secret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? getenv('GOOGLE_CLIENT_SECRET');
+    $redirect_uri = $_ENV['GOOGLE_REDIRECT_URI'] ?? getenv('GOOGLE_REDIRECT_URI');
+    
+    $token_url = 'https://oauth2.googleapis.com/token';
+    
+    $post_data = [
+        'code' => $code,
+        'client_id' => $client_id,
+        'client_secret' => $client_secret,
+        'redirect_uri' => $redirect_uri,
+        'grant_type' => 'authorization_code'
+    ];
+    
+    $ch = curl_init($token_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($http_code !== 200) {
+        error_log("Google token exchange failed: HTTP $http_code - $response");
+        return ['success' => false, 'error' => 'Failed to exchange authorization code'];
+    }
+    
+    $data = json_decode($response, true);
+    
+    if (!isset($data['id_token'])) {
+        error_log("Google token response missing id_token: " . print_r($data, true));
+        return ['success' => false, 'error' => 'Invalid token response'];
+    }
+    
+    return ['success' => true, 'tokens' => $data];
+}
+
+/**
+ * Decode and verify Google ID token (JWT)
+ * Simplified version - in production, should verify signature with Google's public keys
+ */
+function google_decode_id_token($id_token) {
+    // Split JWT into parts
+    $parts = explode('.', $id_token);
+    
+    if (count($parts) !== 3) {
+        return ['success' => false, 'error' => 'Invalid ID token format'];
+    }
+    
+    // Decode payload (middle part)
+    $payload = base64_decode(strtr($parts[1], '-_', '+/'));
+    $user_info = json_decode($payload, true);
+    
+    if (!$user_info) {
+        return ['success' => false, 'error' => 'Failed to decode ID token'];
+    }
+    
+    // Basic validation
+    load_env();
+    $client_id = $_ENV['GOOGLE_CLIENT_ID'] ?? getenv('GOOGLE_CLIENT_ID');
+    
+    if (!isset($user_info['aud']) || $user_info['aud'] !== $client_id) {
+        return ['success' => false, 'error' => 'Invalid token audience'];
+    }
+    
+    if (!isset($user_info['exp']) || $user_info['exp'] < time()) {
+        return ['success' => false, 'error' => 'Token expired'];
+    }
+    
+    return ['success' => true, 'user_info' => $user_info];
+}
+
+/**
+ * Get user info from Google
+ */
+function google_get_user_info($id_token) {
+    $result = google_decode_id_token($id_token);
+    
+    if (!$result['success']) {
+        return $result;
+    }
+    
+    $user_info = $result['user_info'];
+    
+    // Extract relevant fields
+    return [
+        'success' => true,
+        'user' => [
+            'google_id' => $user_info['sub'],
+            'email' => $user_info['email'] ?? '',
+            'name' => $user_info['name'] ?? '',
+            'picture' => $user_info['picture'] ?? '',
+            'email_verified' => $user_info['email_verified'] ?? false
+        ]
+    ];
+}
+
+/**
+ * Find or create user from Google OAuth data
+ */
+function find_or_create_google_user($google_user) {
+    $pdo = db_connect();
+    
+    if (!$pdo) {
+        return ['success' => false, 'error' => 'Database connection failed'];
+    }
+    
+    $email = $google_user['email'];
+    $name = $google_user['name'];
+    
+    // Check if user exists by email
+    $stmt = $pdo->prepare('SELECT * FROM app_user WHERE email = :email');
+    $stmt->execute(['email' => $email]);
+    $user = $stmt->fetch();
+    
+    if ($user) {
+        // User exists - return existing user
+        return ['success' => true, 'user' => $user, 'is_new' => false];
+    }
+    
+    // Create new user - try with name first, fallback without if column doesn't exist
+    try {
+        $stmt = $pdo->prepare('
+            INSERT INTO app_user (name, email, password_hash, created_at) 
+            VALUES (:name, :email, NULL, NOW())
+            RETURNING id, name, email, created_at
+        ');
+        
+        $stmt->execute([
+            'name' => $name,
+            'email' => $email
+        ]);
+        
+        $user = $stmt->fetch();
+        
+        if (!$user) {
+            // Fallback for databases that don't support RETURNING
+            $user_id = $pdo->lastInsertId();
+            $stmt = $pdo->prepare('SELECT * FROM app_user WHERE id = :id');
+            $stmt->execute(['id' => $user_id]);
+            $user = $stmt->fetch();
+        }
+        
+        return ['success' => true, 'user' => $user, 'is_new' => true];
+    } catch (PDOException $e) {
+        error_log("Failed to create Google user: " . $e->getMessage());
+        
+        // Check if name column doesn't exist - fallback to insert without it
+        if (strpos($e->getMessage(), 'column "name"') !== false) {
+            try {
+                $stmt = $pdo->prepare('
+                    INSERT INTO app_user (email, password_hash, created_at) 
+                    VALUES (:email, NULL, NOW())
+                    RETURNING id, email, created_at
+                ');
+                
+                $stmt->execute(['email' => $email]);
+                
+                $user = $stmt->fetch();
+                
+                if (!$user) {
+                    $user_id = $pdo->lastInsertId();
+                    $stmt = $pdo->prepare('SELECT * FROM app_user WHERE id = :id');
+                    $stmt->execute(['id' => $user_id]);
+                    $user = $stmt->fetch();
+                }
+                
+                return ['success' => true, 'user' => $user, 'is_new' => true];
+            } catch (PDOException $e2) {
+                error_log("Failed to create Google user (fallback): " . $e2->getMessage());
+                return ['success' => false, 'error' => 'Failed to create user account: ' . $e2->getMessage()];
+            }
+        }
+        
+        return ['success' => false, 'error' => 'Failed to create user account: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Handle complete Google OAuth flow
+ */
+function authenticate_google($code, $state) {
+    // Verify state to prevent CSRF
+    if (!isset($_SESSION['google_oauth_state']) || $_SESSION['google_oauth_state'] !== $state) {
+        return ['success' => false, 'error' => 'Invalid state parameter'];
+    }
+    
+    // Clear state
+    unset($_SESSION['google_oauth_state']);
+    
+    // Exchange code for tokens
+    $token_result = google_exchange_code($code);
+    
+    if (!$token_result['success']) {
+        return $token_result;
+    }
+    
+    // Get user info from ID token
+    $user_info_result = google_get_user_info($token_result['tokens']['id_token']);
+    
+    if (!$user_info_result['success']) {
+        return $user_info_result;
+    }
+    
+    // Find or create user
+    $user_result = find_or_create_google_user($user_info_result['user']);
+    
+    if (!$user_result['success']) {
+        return $user_result;
+    }
+    
+    // Return user with flag indicating if they're new
+    return [
+        'success' => true,
+        'user' => $user_result['user'],
+        'is_new_user' => $user_result['is_new']
+    ];
 }
 

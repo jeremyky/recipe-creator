@@ -491,7 +491,7 @@ const ChatInterface = {
                         noteDiv.innerHTML = `
                             <div class="chat-message-avatar">ℹ️</div>
                             <div class="chat-message-content">
-                                <p style="font-size: 12px; font-style: italic; opacity: 0.7;">💳 Note: Limited response (OpenAI API quota exceeded). Add credits to your OpenAI account for full AI functionality.</p>
+                                <p style="font-size: 12px; font-style: italic; opacity: 0.7;">ℹ️ Note: Using basic response mode. For AI-powered suggestions, add your OpenAI API key to the .env file.</p>
                             </div>
                         `;
                         document.getElementById('chat-messages').appendChild(noteDiv);

@@ -6,6 +6,33 @@
  */
 
 /**
+ * Load environment variables from .env file
+ */
+function load_env() {
+    static $loaded = false;
+    
+    if ($loaded) {
+        return;
+    }
+    
+    // Load .env file if it exists and is readable
+    $envFile = __DIR__ . '/../.env';
+    if (file_exists($envFile) && is_readable($envFile)) {
+        $lines = @file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines !== false) {
+            foreach ($lines as $line) {
+                if (strpos(trim($line), '#') === 0) continue; // Skip comments
+                if (strpos($line, '=') === false) continue; // Skip invalid lines
+                list($key, $value) = explode('=', $line, 2);
+                $_ENV[trim($key)] = trim($value);
+            }
+        }
+    }
+    
+    $loaded = true;
+}
+
+/**
  * Establish PDO connection to Postgres database
  * @return PDO
  */
@@ -19,16 +46,8 @@ function db_connect() {
     }
     
     if ($pdo === null) {
-        // Load .env file if it exists
-        $envFile = __DIR__ . '/../.env';
-        if (file_exists($envFile)) {
-            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach ($lines as $line) {
-                if (strpos(trim($line), '#') === 0) continue; // Skip comments
-                list($key, $value) = explode('=', $line, 2);
-                $_ENV[trim($key)] = trim($value);
-            }
-        }
+        // Load environment variables
+        load_env();
         
         $host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
         $dbname = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'juh7hc';

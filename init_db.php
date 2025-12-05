@@ -40,6 +40,9 @@ $sql_statements = [
       created_at TIMESTAMP DEFAULT NOW()
     )",
     
+    "ALTER TABLE app_user ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT 'User'",
+    "ALTER TABLE app_user ADD COLUMN IF NOT EXISTS password_hash TEXT",
+    
     "CREATE TABLE IF NOT EXISTS recipe (
       id SERIAL PRIMARY KEY,
       user_id INT REFERENCES app_user(id) ON DELETE CASCADE,
@@ -80,6 +83,9 @@ $sql_statements = [
     "CREATE INDEX IF NOT EXISTS idx_favorite_recipe_id ON favorite(recipe_id)",
     
     "ALTER TABLE recipe ADD COLUMN IF NOT EXISTS cuisine TEXT",
+    
+    "ALTER TABLE app_user ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT 'User'",
+    "ALTER TABLE app_user ADD COLUMN IF NOT EXISTS password_hash TEXT",
     
     "INSERT INTO app_user (id, email) VALUES (1, 'demo@example.com') ON CONFLICT (id) DO NOTHING",
     

@@ -77,9 +77,15 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
 // Extract data
 $title = isset($input['title']) ? trim($input['title']) : '';
-$cuisine = isset($input['cuisine']) ? trim($input['cuisine']) : 'other';
+$cuisine = isset($input['cuisine']) ? strtolower(trim($input['cuisine'])) : 'other';
 $ingredients = isset($input['ingredients']) ? trim($input['ingredients']) : '';
 $steps = isset($input['steps']) ? trim($input['steps']) : '';
+
+// Normalize cuisine to match manual recipes (lowercase, valid options)
+$valid_cuisines = ['italian', 'chinese', 'mexican', 'indian', 'thai', 'greek', 'american', 'other'];
+if (!in_array($cuisine, $valid_cuisines)) {
+    $cuisine = 'other';
+}
 
 // Log what we received
 debug_log_api("Received recipe data:");
@@ -136,10 +142,10 @@ if (!$db) {
 
 // Save to database
 try {
-    // Insert recipe
+    // Insert recipe (with image_url set to NULL for AI recipes - can be updated later)
     $stmt = $db->prepare('
-        INSERT INTO recipe (user_id, title, cuisine, steps, created_at)
-        VALUES (?, ?, ?, ?, NOW())
+        INSERT INTO recipe (user_id, title, cuisine, image_url, steps, created_at)
+        VALUES (?, ?, ?, NULL, ?, NOW())
         RETURNING id
     ');
     

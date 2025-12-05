@@ -88,35 +88,63 @@ $ingredients = $ingredients ?? [];
 .checkbox-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border-subtle);
+  border-radius: 10px;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .checkbox-item:hover {
-  background: var(--panel);
-  border-color: var(--accent);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .checkbox-item input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
+  position: relative;
+  width: 22px;
+  height: 22px;
   margin-right: 1rem;
   cursor: pointer;
-  accent-color: var(--accent);
+  appearance: none;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 6px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.checkbox-item input[type="checkbox"]:hover {
+  border-color: var(--color-primary);
+}
+
+.checkbox-item input[type="checkbox"]:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.checkbox-item input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .checkbox-item label {
   cursor: pointer;
   flex: 1;
   user-select: none;
+  transition: all 0.2s ease;
 }
 
 .checkbox-item input[type="checkbox"]:checked + label {
-  text-decoration: line-through;
-  opacity: 0.6;
+  color: var(--color-text-muted);
+  opacity: 0.7;
 }
 
 .steps-checklist {
@@ -129,30 +157,59 @@ $ingredients = $ingredients ?? [];
 .step-item {
   display: flex;
   gap: 1rem;
-  padding: 1.25rem;
-  background: var(--bg);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  background: var(--color-bg-elevated);
+  border: 1.5px solid var(--color-border-subtle);
+  border-radius: 12px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .step-item:hover {
-  background: var(--panel);
-  border-color: var(--accent);
-  box-shadow: var(--shadow-md);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .step-item.completed {
-  opacity: 0.6;
-  background: var(--panel);
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
 }
 
 .step-checkbox input[type="checkbox"] {
-  width: 1.5rem;
-  height: 1.5rem;
+  position: relative;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
   cursor: pointer;
-  accent-color: var(--accent);
+  appearance: none;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 6px;
+  background: white;
+  transition: all 0.2s ease;
   margin-top: 0.25rem;
+}
+
+.step-checkbox input[type="checkbox"]:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.step-checkbox input[type="checkbox"]:checked {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.step-checkbox input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .step-body {
@@ -166,22 +223,27 @@ $ingredients = $ingredients ?? [];
 
 .step-number {
   display: inline-block;
-  background: var(--accent);
+  background: var(--color-primary);
   color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius);
-  font-size: 0.85rem;
-  font-weight: bold;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
   margin-bottom: 0.5rem;
+  letter-spacing: 0.3px;
 }
 
 .step-text {
-  line-height: 1.6;
+  line-height: 1.7;
   margin-top: 0.5rem;
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
 .step-item.completed .step-text {
-  text-decoration: line-through;
+  color: var(--color-text-muted);
+  opacity: 0.75;
 }
 
 #finish-cooking:disabled {

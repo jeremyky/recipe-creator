@@ -8,9 +8,21 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-echo "🌱 Populating Sample Data...\n\n";
+// Determine if running from CLI or web
+$isCli = php_sapi_name() === 'cli';
+
+if (!$isCli) {
+    echo "<!DOCTYPE html><html><head><title>Populate Sample Data</title>";
+    echo "<style>body{font-family:monospace;padding:20px;max-width:800px;margin:0 auto;background:#f9f9f9;} .ok{color:green;} .error{color:red;} pre{background:#fff;padding:15px;border-radius:4px;border:1px solid #ddd;}</style>";
+    echo "</head><body><h1>🌱 Populating Sample Data</h1>";
+} else {
+    echo "🌱 Populating Sample Data...\n\n";
+}
 
 require __DIR__ . '/lib/db.php';
+
+// Load environment variables
+load_env();
 
 try {
 $pdo = db_connect();
@@ -26,8 +38,27 @@ if ($pdo === null) {
 
 echo "✅ Connected to database\n\n";
 
-// Demo user ID (created by init_db.php)
-$userId = 1;
+// Determine user ID
+// If running from web, use current logged-in user
+// If running from CLI, use demo user (ID=1)
+if (php_sapi_name() === 'cli') {
+    $userId = 1; // Demo user for CLI
+    echo "📝 Using demo user (ID=1) for CLI execution\n\n";
+} else {
+    // Web execution - use logged-in user
+    require_once __DIR__ . '/lib/session.php';
+    require_once __DIR__ . '/lib/auth.php';
+    
+    if (!is_authenticated()) {
+        echo "❌ You must be logged in to populate data\n";
+        echo "<a href='index.php?action=login'>Login</a> or <a href='index.php?action=signup'>Sign up</a> first\n";
+        exit;
+    }
+    
+    $userId = auth_user_id();
+    $user = auth_user();
+    echo "📝 Adding data for: {$user['email']} (ID=$userId)\n\n";
+}
 
 // Sample recipes
 $sampleRecipes = [
@@ -223,8 +254,18 @@ foreach ($samplePantry as $item) {
     }
 }
 
-echo "\n✨ Sample Data Population Complete!\n";
-echo "🎉 You now have 6 recipes and 15 pantry items to test with.\n";
-echo "\n💡 Access the app at: http://localhost:8000\n";
-echo "   (Demo user auto-login is enabled for local testing)\n\n";
+if (!$isCli) {
+    echo "<div style='margin-top:30px;padding:20px;background:#d4edda;border:1px solid #c3e6cb;border-radius:4px;'>";
+    echo "<h2 style='color:#155724;margin-top:0;'>✨ Sample Data Population Complete!</h2>";
+    echo "<p style='color:#155724;'>🎉 You now have 6 recipes and 15 pantry items to test with.</p>";
+    echo "<p style='margin-top:20px;'><a href='index.php?action=recipes' style='padding:10px 20px;background:#6366f1;color:white;text-decoration:none;border-radius:4px;display:inline-block;'>📖 View Your Recipes</a></p>";
+    echo "<p><a href='index.php?action=pantry' style='padding:10px 20px;background:#6366f1;color:white;text-decoration:none;border-radius:4px;display:inline-block;'>🥫 View Your Pantry</a></p>";
+    echo "</div>";
+    echo "</body></html>";
+} else {
+    echo "\n✨ Sample Data Population Complete!\n";
+    echo "🎉 You now have 6 recipes and 15 pantry items to test with.\n";
+    echo "\n💡 Access the app at: http://localhost:8000\n";
+    echo "   (Demo user auto-login is enabled for local testing)\n\n";
+}
 ?>

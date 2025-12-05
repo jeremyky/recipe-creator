@@ -1,0 +1,28 @@
+# SFTP commands to deploy to cs4640 server
+# Run with: sftp -P 22 juh7hc@cs4640.cs.virginia.edu < sftp_commands.txt
+
+cd public_html
+
+# Delete old index.html so index.php becomes the default
+rm index.html
+
+# Upload directories (will overwrite existing files)
+put -r api
+put -r assets
+put -r lib
+put -r views
+
+# Upload individual files (will overwrite)
+put .env
+put .htaccess
+put chat.html
+put cook.html
+put index.php
+put init_db.php
+put match.html
+put pantry.html
+put recipes.html
+put upload.html
+put uploadphp.sql
+
+bye

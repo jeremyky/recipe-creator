@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Filters</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="assets/filters.css">
+    <style>
+        body { padding: 20px; }
+        .test-section { margin: 40px 0; padding: 20px; border: 2px solid var(--color-border); border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Filter System Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Dropdown Options</h2>
+        <p>Click the pill, then try hovering and clicking the options:</p>
+        
+        <div style="position: relative;">
+            <button 
+                type="button"
+                class="filter-pill"
+                id="test-pill"
+                data-dropdown="test-dropdown"
+                tabindex="0">
+                <span class="icon">🍽️</span>
+                <span class="filter-value">Test Dropdown</span>
+                <span class="chevron">▼</span>
+            </button>
+            
+            <div class="filter-dropdown" id="test-dropdown" data-for-pill="test-pill">
+                <div class="filter-dropdown-header">Test Options</div>
+                <div class="filter-dropdown-option" data-value="">All Items</div>
+                <div class="filter-dropdown-option" data-value="option1">Option 1</div>
+                <div class="filter-dropdown-option" data-value="option2">Option 2</div>
+                <div class="filter-dropdown-option" data-value="option3">Option 3</div>
+            </div>
+        </div>
+        
+        <div id="test-output" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>Console Output:</strong> Open F12 console to see debug messages
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: CSS Hover States</h2>
+        <p>Hover over each element to test hover states:</p>
+        
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px;">
+            <div class="filter-pill" style="cursor: pointer;">
+                <span>Hover me (pill)</span>
+            </div>
+            
+            <div style="background: var(--color-bg-elevated); padding: 16px; border-radius: 8px;">
+                <div class="filter-dropdown-option" style="cursor: pointer;">
+                    Hover me (option)
+                </div>
+                <div class="filter-dropdown-option selected" style="cursor: pointer;">
+                    Hover me (selected)
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="assets/js/filters.js"></script>
+    
+    <script>
+        // Manual test without form submission
+        document.querySelectorAll('.filter-dropdown-option').forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                console.log('✅ Option clicked (direct listener):', this.textContent.trim());
+                document.getElementById('test-output').innerHTML += 
+                    '<div>Clicked: ' + this.textContent.trim() + ' at ' + new Date().toLocaleTimeString() + '</div>';
+            });
+        });
+        
+        // Test if CSS is loaded
+        const testPill = document.getElementById('test-pill');
+        const computedStyle = window.getComputedStyle(testPill);
+        console.log('🎨 Pill border-radius:', computedStyle.borderRadius);
+        console.log('🎨 Pill transition:', computedStyle.transition);
+        
+        if (computedStyle.borderRadius === '50px') {
+            console.log('✅ CSS loaded correctly!');
+        } else {
+            console.error('❌ CSS not loaded or not applied!');
+        }
+    </script>
+</body>
+</html>
+

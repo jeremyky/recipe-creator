@@ -5,41 +5,60 @@ $recipe = $recipe ?? [];
 $ingredients = $ingredients ?? [];
 ?>
 
-<div style="margin-bottom: var(--space-xl);">
-  <a href="index.php?action=recipes" class="btn-ghost" style="padding: var(--space-s) var(--space-l);">
-    ← Back to Recipes
+<div style="margin-bottom: var(--space-2xl);">
+  <a href="index.php?action=recipes" class="btn-ghost" style="padding: var(--space-m) var(--space-xl); font-size: 1rem; font-weight: 600; display: inline-flex; align-items: center; gap: var(--space-s);">
+    <span style="font-size: 1.2rem;">←</span>
+    <span>Back to Recipes</span>
   </a>
 </div>
 
-<article class="recipe-detail">
-  <header class="recipe-header card">
+<article class="recipe-detail" style="max-width: 1000px; margin: 0 auto;">
+  <header class="recipe-header card" style="padding: 0; overflow: hidden;">
     <?php if (!empty($recipe['image_url'])): ?>
-      <div class="card-image" style="margin: calc(var(--space-xl) * -1) calc(var(--space-xl) * -1) var(--space-xl);">
-        <img src="<?= h($recipe['image_url']) ?>" alt="<?= h($recipe['title']) ?>">
+      <div style="width: 100%; height: 400px; overflow: hidden; border-radius: var(--radius-l) var(--radius-l) 0 0;">
+        <img src="<?= h($recipe['image_url']) ?>" alt="<?= h($recipe['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
       </div>
     <?php endif; ?>
     
-    <div class="section-header">
-      <h1><?= h($recipe['title']) ?></h1>
-      <p>
-        Created <?= date('M j, Y', strtotime($recipe['created_at'])) ?> • 
-        <span class="chip chip-primary"><?= count($ingredients) ?> ingredients</span>
-      </p>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-l); margin-top: var(--space-xl);">
-      <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" class="btn-primary" style="padding: var(--space-l) var(--space-xl); font-size: 1.1rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: var(--space-s);">
-        <span style="font-size: 1.5rem;">👨‍🍳</span>
-        <span>Start Cooking</span>
-      </a>
-      <a href="index.php?action=recipe_edit&id=<?= $recipe['id'] ?>" class="btn-secondary" style="padding: var(--space-l) var(--space-xl); font-size: 1.1rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: var(--space-s);">
-        <span style="font-size: 1.5rem;">✏️</span>
-        <span>Edit Recipe</span>
-      </a>
-      <button onclick="confirmDeleteRecipe('<?= $recipe['id'] ?>', '<?= h(addslashes($recipe['title'])) ?>')" class="btn-ghost" style="padding: var(--space-l) var(--space-xl); font-size: 1.1rem; font-weight: 600; color: var(--color-danger); text-align: center; display: flex; align-items: center; justify-content: center; gap: var(--space-s);">
-        <span style="font-size: 1.5rem;">🗑️</span>
-        <span>Delete</span>
-      </button>
+    <div style="padding: var(--space-2xl);">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-l);">
+        <div>
+          <h1 style="font-size: 2rem; font-weight: 700; margin: 0 0 var(--space-m); letter-spacing: -0.02em;"><?= h($recipe['title']) ?></h1>
+          <div style="display: flex; align-items: center; gap: var(--space-l); color: var(--color-text-muted); font-size: 0.95rem;">
+            <span>📅 <?= date('M j, Y', strtotime($recipe['created_at'])) ?></span>
+            <span>•</span>
+            <span>📊 <?= count($ingredients) ?> ingredients</span>
+            <?php if (!empty($recipe['cuisine'])): ?>
+              <span>•</span>
+              <span>🍽️ <?= ucfirst(h($recipe['cuisine'])) ?></span>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: var(--space-xl);">
+        <a href="index.php?action=cook_session&id=<?= $recipe['id'] ?>" 
+           style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 12px; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);"
+           onmouseover="this.style.background='linear-gradient(135deg, #4f46e5, #4338ca)'; this.style.boxShadow='0 6px 16px rgba(99, 102, 241, 0.35)';"
+           onmouseout="this.style.background='linear-gradient(135deg, #6366f1, #4f46e5)'; this.style.boxShadow='0 4px 12px rgba(99, 102, 241, 0.25)';">
+          <span style="font-size: 20px; line-height: 1;">👨‍🍳</span>
+          <span>Start Cooking</span>
+        </a>
+        <a href="index.php?action=recipe_edit&id=<?= $recipe['id'] ?>" 
+           style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: #6366f1; border: 1.5px solid rgba(99, 102, 241, 0.4); border-radius: 12px; text-decoration: none; transition: all 0.2s ease;"
+           onmouseover="this.style.background='rgba(99, 102, 241, 0.08)'; this.style.borderColor='#6366f1';"
+           onmouseout="this.style.background='white'; this.style.borderColor='rgba(99, 102, 241, 0.4)';">
+          <span style="font-size: 20px; line-height: 1;">✏️</span>
+          <span>Edit</span>
+        </a>
+        <button onclick="confirmDeleteRecipe('<?= $recipe['id'] ?>', '<?= h(addslashes($recipe['title'])) ?>')" 
+                style="height: 54px; padding: 0 1.4rem; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; color: #b23a48; border: 1.5px solid rgba(231, 111, 81, 0.4); background: white; border-radius: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s ease; font-family: inherit;"
+                onmouseover="this.style.background='rgba(231, 111, 81, 0.08)'; this.style.borderColor='#e76f51';"
+                onmouseout="this.style.background='white'; this.style.borderColor='rgba(231, 111, 81, 0.4)';">
+          <span style="font-size: 20px; line-height: 1;">🗑️</span>
+          <span>Delete</span>
+        </button>
+      </div>
     </div>
   </header>
 

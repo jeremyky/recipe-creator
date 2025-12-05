@@ -137,6 +137,53 @@ switch ($action) {
         redirect('index.php?action=landing');
         break;
     
+    // Google OAuth
+    case 'google_login':
+        // Redirect to Google's OAuth authorization page
+        $auth_url = google_auth_url();
+        redirect($auth_url);
+        break;
+    
+    case 'google_callback':
+        // Handle Google OAuth callback
+        $code = $_GET['code'] ?? null;
+        $state = $_GET['state'] ?? null;
+        $error = $_GET['error'] ?? null;
+        
+        // Check for errors from Google
+        if ($error) {
+            flash('error', 'Google sign-in was cancelled or failed');
+            redirect('index.php?action=login');
+        }
+        
+        // Validate required parameters
+        if (!$code || !$state) {
+            flash('error', 'Invalid Google OAuth response');
+            redirect('index.php?action=login');
+        }
+        
+        // Authenticate with Google
+        $result = authenticate_google($code, $state);
+        
+        if (!$result['success']) {
+            flash('error', $result['error']);
+            redirect('index.php?action=login');
+        }
+        
+        // Login user
+        login_user($result['user']['id']);
+        
+        // Set welcome message
+        if ($result['is_new_user']) {
+            flash('success', 'Welcome to Recipe Creator! Your account has been created.');
+        } else {
+            flash('success', 'Welcome back, ' . htmlspecialchars($result['user']['name']) . '!');
+        }
+        
+        // Redirect to home
+        redirect('index.php?action=home');
+        break;
+    
     // Protected app pages (require authentication)
     case 'home':
         require_auth();
@@ -319,18 +366,33 @@ switch ($action) {
         
         foreach ($all_recipes as $recipe) {
             $recipe_ingredients = get_recipe_ingredients($recipe['id']);
-            $recipe_ingredient_names = array_map(function($line) {
-                // Extract ingredient name from lines like "2 tbsp olive oil" or "olive oil"
-                $parts = preg_split('/\s+/', strtolower(trim($line)), 2);
-                return $parts[count($parts) - 1]; // Get last part (usually the ingredient name)
-            }, $recipe_ingredients);
             
             $matched = 0;
-            foreach ($recipe_ingredient_names as $ing_name) {
+            foreach ($recipe_ingredients as $recipe_line) {
+                $recipe_line_lower = strtolower(trim($recipe_line));
+                
+                // Extract key ingredient words (remove numbers, units)
+                $recipe_words = preg_split('/[\s,()]+/', $recipe_line_lower);
+                $recipe_words = array_filter($recipe_words, function($word) {
+                    // Remove common units and numbers
+                    $ignore = ['lb', 'lbs', 'oz', 'cup', 'cups', 'tbsp', 'tsp', 'g', 'kg', 'ml', 'whole', 'piece', 'pieces', 'can', 'cans', 'carton', 'cartons', 'fl', 'diced', 'chopped', 'sliced', 'grated', 'fresh', 'dried', 'large', 'small', 'medium'];
+                    return !is_numeric($word) && strlen($word) > 2 && !in_array($word, $ignore);
+                });
+                
                 foreach ($pantry_ingredient_names as $pantry_name) {
-                    if (strpos($ing_name, $pantry_name) !== false || strpos($pantry_name, $ing_name) !== false) {
-                        $matched++;
-                        break;
+                    $pantry_words = preg_split('/[\s,()]+/', $pantry_name);
+                    $pantry_words = array_filter($pantry_words, function($word) {
+                        return strlen($word) > 2;
+                    });
+                    
+                    // Check if any significant words match
+                    foreach ($recipe_words as $recipe_word) {
+                        foreach ($pantry_words as $pantry_word) {
+                            if (strpos($recipe_word, $pantry_word) !== false || strpos($pantry_word, $recipe_word) !== false) {
+                                $matched++;
+                                break 3; // Break all loops for this ingredient
+                            }
+                        }
                     }
                 }
             }
@@ -531,7 +593,11 @@ switch ($action) {
     case 'chat':
         require_auth();
         // Auto-authenticate chat access for this session (password stored server-side only)
-        $required_password = $_ENV['CHAT_PASSWORD'] ?? getenv('CHAT_PASSWORD') ?? 'ShaunBoy123';
+        $required_password = $_ENV['CHAT_PASSWORD'] ?? getenv('CHAT_PASSWORD') ?? '';
+        if (empty($required_password)) {
+            // No password required if not set in environment
+            $_SESSION['chat_authenticated'] = true;
+        }
         if (!isset($_SESSION['chat_authenticated'])) {
             // Authenticate automatically (password never exposed to client)
             $_SESSION['chat_authenticated'] = true;

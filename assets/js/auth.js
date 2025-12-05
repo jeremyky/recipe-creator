@@ -264,21 +264,8 @@ const AuthValidator = {
     
     // Initiate Google OAuth flow
     initiateGoogleAuth: function(type) {
-        // Placeholder for Google OAuth integration
-        // In production, this would use Google's OAuth 2.0 library
-        alert(`Google ${type} will be implemented with OAuth 2.0 integration. For now, please use email ${type}.`);
-        
-        // Example of what would be implemented:
-        /*
-        google.accounts.oauth2.initTokenClient({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID',
-            scope: 'email profile',
-            callback: (response) => {
-                // Handle OAuth response
-                this.handleGoogleCallback(response, type);
-            }
-        }).requestAccessToken();
-        */
+        // Redirect to backend which will handle OAuth flow
+        window.location.href = 'index.php?action=google_login';
     },
     
     // Handle Google OAuth callback (placeholder)

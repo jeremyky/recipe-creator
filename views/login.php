@@ -48,7 +48,7 @@ if (!function_exists('csrf_token')) {
       </div>
       
       <form method="POST" action="index.php?action=login_submit" class="auth-form">
-        <input type="hidden" name="csrf" value="<?= h(csrf()) ?>">
+        <input type="hidden" name="csrf" value="<?= h(csrf_token()) ?>">
         
         <div class="form-group">
           <label for="email">Email address</label>

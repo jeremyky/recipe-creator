@@ -2,118 +2,205 @@
 $page_title = 'Browse Recipes - Recipe Creator';
 $current_page = 'recipes';
 $recipes = $recipes ?? [];
-$last_cuisine = $last_cuisine ?? '';
+
+// Get current filters
+$currentSearch = $_GET['search'] ?? '';
+$currentCuisine = $_GET['cuisine'] ?? '';
+$currentSort = $_GET['sort'] ?? 'date_desc';
+$favoritesOnly = !empty($_GET['favorites_only']);
+
+// Sort options mapping
+$sortOptions = [
+    'date_desc' => '📅 Newest First',
+    'date_asc' => '📅 Oldest First',
+    'name_asc' => '🔤 A → Z',
+    'name_desc' => '🔤 Z → A',
+    'ingredients_asc' => '📊 Fewest Ingredients',
+    'ingredients_desc' => '📊 Most Ingredients'
+];
+$currentSortLabel = $sortOptions[$currentSort] ?? $sortOptions['date_desc'];
+
+// Cuisine options
+$cuisines = ['italian', 'chinese', 'mexican', 'indian', 'thai', 'greek', 'american', 'other'];
+$currentCuisineLabel = $currentCuisine ? ucfirst($currentCuisine) : 'All Cuisines';
 ?>
 
-<div class="section-header">
-  <h1>Browse Recipes</h1>
-  <p>Discover recipes by cuisine, search by name, or explore our collection</p>
-</div>
+<!-- Include filter CSS -->
+<link rel="stylesheet" href="assets/filters.css">
 
-<section aria-labelledby="filters-heading">
-  <h2 class="sr-only" id="filters-heading">Filter recipes</h2>
-  <div class="card">
-    <form method="get" action="index.php" id="recipe-filters-form">
+<!-- Modern Filter Bar -->
+<div class="filter-bar-container">
+  <div class="filter-bar">
+    <form method="get" action="index.php" id="filter-form" role="search" aria-label="Recipe filters">
       <input type="hidden" name="action" value="recipes">
       
-      <!-- Search and Sort Row -->
-      <div style="display: grid; grid-template-columns: 1fr 200px 200px; gap: var(--space-l); margin-bottom: var(--space-l);">
-        <div>
-          <label for="search-recipes">Search recipes</label>
-          <input type="search" id="search-recipes" name="search" 
-                 value="<?= h($_GET['search'] ?? '') ?>" 
-                 placeholder="Search by name or ingredients..."
-                 style="width: 100%;">
+      <!-- Main Filter Controls -->
+      <div class="filter-controls">
+        <!-- Search (Pill-shaped with icon) -->
+        <div class="filter-search">
+          <input 
+            type="search" 
+            name="search" 
+            id="search-input"
+            value="<?= h($currentSearch) ?>"
+            placeholder="Search recipes or ingredients..."
+            aria-label="Search recipes"
+            autocomplete="off">
+          <span class="filter-search-icon" aria-hidden="true">🔍</span>
         </div>
-        <div>
-          <label for="cuisine-filter">Cuisine Type</label>
-          <select id="cuisine-filter" name="cuisine" onchange="this.form.submit()">
-            <option value="">All cuisines</option>
-            <?php
-            $cuisines = ['italian', 'chinese', 'mexican', 'indian', 'thai', 'greek', 'american', 'other'];
-            foreach ($cuisines as $cuisine):
-            ?>
-              <option value="<?= h($cuisine) ?>" 
-                      <?= ($_GET['cuisine'] ?? '') === $cuisine ? 'selected' : '' ?>>
+        
+        <!-- Cuisine Dropdown Pill -->
+        <div style="position: relative;">
+          <button 
+            type="button"
+            class="filter-pill <?= $currentCuisine ? 'active' : '' ?>"
+            id="cuisine-pill"
+            data-dropdown="cuisine-dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            tabindex="0">
+            <span class="icon" aria-hidden="true">🍽️</span>
+            <span class="filter-value"><?= h($currentCuisineLabel) ?></span>
+            <span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          
+          <div class="filter-dropdown" id="cuisine-dropdown" data-for-pill="cuisine-pill" role="menu">
+            <div class="filter-dropdown-header">Cuisine Type</div>
+            <div class="filter-dropdown-option <?= !$currentCuisine ? 'selected' : '' ?>" 
+                 role="menuitem"
+                 data-value="">
+              All Cuisines
+              <span class="check-icon" aria-hidden="true">✓</span>
+            </div>
+            <?php foreach ($cuisines as $cuisine): ?>
+              <div class="filter-dropdown-option <?= $currentCuisine === $cuisine ? 'selected' : '' ?>" 
+                   role="menuitem"
+                   data-value="<?= h($cuisine) ?>">
                 <?= ucfirst(h($cuisine)) ?>
-              </option>
+                <span class="check-icon" aria-hidden="true">✓</span>
+              </div>
             <?php endforeach; ?>
-          </select>
+          </div>
+          <input type="hidden" name="cuisine" id="cuisine-input" value="<?= h($currentCuisine) ?>">
         </div>
-        <div>
-          <label for="sort-by">Sort By</label>
-          <select id="sort-by" name="sort" onchange="this.form.submit()">
-            <option value="date_desc" <?= ($_GET['sort'] ?? 'date_desc') === 'date_desc' ? 'selected' : '' ?>>
-              📅 Newest First
-            </option>
-            <option value="date_asc" <?= ($_GET['sort'] ?? '') === 'date_asc' ? 'selected' : '' ?>>
-              📅 Oldest First
-            </option>
-            <option value="name_asc" <?= ($_GET['sort'] ?? '') === 'name_asc' ? 'selected' : '' ?>>
-              🔤 A → Z
-            </option>
-            <option value="name_desc" <?= ($_GET['sort'] ?? '') === 'name_desc' ? 'selected' : '' ?>>
-              🔤 Z → A
-            </option>
-            <option value="ingredients_asc" <?= ($_GET['sort'] ?? '') === 'ingredients_asc' ? 'selected' : '' ?>>
-              📊 Fewest Ingredients
-            </option>
-            <option value="ingredients_desc" <?= ($_GET['sort'] ?? '') === 'ingredients_desc' ? 'selected' : '' ?>>
-              📊 Most Ingredients
-            </option>
-          </select>
+        
+        <!-- Sort Dropdown Pill -->
+        <div style="position: relative;">
+          <button 
+            type="button"
+            class="filter-pill sort-button <?= $currentSort !== 'date_desc' ? 'active' : '' ?>"
+            id="sort-pill"
+            data-dropdown="sort-dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            tabindex="0">
+            <span class="icon" aria-hidden="true">⇅</span>
+            <span class="sort-label">Sort:</span>
+            <span class="sort-value"><?= h($currentSortLabel) ?></span>
+            <span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          
+          <div class="filter-dropdown" id="sort-dropdown" data-for-pill="sort-pill" role="menu">
+            <div class="filter-dropdown-header">Sort Order</div>
+            <?php foreach ($sortOptions as $value => $label): ?>
+              <div class="filter-dropdown-option <?= $currentSort === $value ? 'selected' : '' ?>" 
+                   role="menuitem"
+                   data-value="<?= h($value) ?>">
+                <?= h($label) ?>
+                <span class="check-icon" aria-hidden="true">✓</span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+          <input type="hidden" name="sort" id="sort-input" value="<?= h($currentSort) ?>">
+        </div>
+        
+        <!-- Favorites Toggle -->
+        <button 
+          type="button"
+          class="favorites-toggle <?= $favoritesOnly ? 'active' : '' ?>"
+          onclick="this.classList.toggle('active'); document.getElementById('favorites-input').value = this.classList.contains('active') ? '1' : ''; document.getElementById('filter-form').submit();"
+          aria-pressed="<?= $favoritesOnly ? 'true' : 'false' ?>"
+          aria-label="<?= $favoritesOnly ? 'Show all recipes' : 'Show only favorites' ?>">
+          <span class="star" aria-hidden="true"><?= $favoritesOnly ? '⭐' : '☆' ?></span>
+          <span><?= $favoritesOnly ? 'Favorites Only' : 'Show Favorites' ?></span>
+        </button>
+        <input type="hidden" name="favorites_only" id="favorites-input" value="<?= $favoritesOnly ? '1' : '' ?>">
+        
+        <!-- Results Summary -->
+        <div class="results-summary">
+          <span class="results-count"><?= count($recipes) ?></span>
+          <span>recipe<?= count($recipes) !== 1 ? 's' : '' ?></span>
         </div>
       </div>
       
-      <!-- Filter Checkboxes Row -->
-      <div style="display: flex; gap: var(--space-xl); align-items: center; flex-wrap: wrap; padding: var(--space-m) 0; border-top: 1px solid var(--color-border-subtle);">
-        <label style="display: flex; align-items: center; gap: var(--space-s); cursor: pointer; user-select: none;">
-          <input type="checkbox" id="favorites-only" name="favorites_only" value="1" 
-                 <?= !empty($_GET['favorites_only']) ? 'checked' : '' ?>
-                 onchange="this.form.submit()"
-                 style="width: 18px; height: 18px; cursor: pointer;">
-          <span style="font-weight: 500;">⭐ Favorites only</span>
-        </label>
-        
-        <button type="submit" class="btn-primary" style="margin-left: auto;">
-          🔍 Apply Filters
-        </button>
-        
-        <?php if (!empty($_GET['search']) || !empty($_GET['cuisine']) || !empty($_GET['favorites_only'])): ?>
-          <a href="index.php?action=recipes<?= !empty($_GET['sort']) ? '&sort=' . h($_GET['sort']) : '' ?>" 
-             class="btn-ghost" 
-             style="padding: var(--space-s) var(--space-m);">
-            ✖️ Clear Filters
-          </a>
-        <?php endif; ?>
-      </div>
+      <!-- Active Filter Chips -->
+      <?php if ($currentSearch || $currentCuisine || $favoritesOnly): ?>
+        <div class="filter-chips" role="status" aria-live="polite">
+          <?php if ($currentSearch): ?>
+            <div class="filter-chip" data-filter-type="search">
+              <span class="chip-label">Search:</span>
+              <span class="chip-value"><?= h($currentSearch) ?></span>
+              <button 
+                type="button" 
+                class="filter-chip-remove" 
+                onclick="document.getElementById('search-input').value=''; document.getElementById('filter-form').submit();"
+                aria-label="Remove search filter">
+                ×
+              </button>
+            </div>
+          <?php endif; ?>
+          
+          <?php if ($currentCuisine): ?>
+            <div class="filter-chip" data-filter-type="cuisine">
+              <span class="chip-label">Cuisine:</span>
+              <span class="chip-value"><?= h(ucfirst($currentCuisine)) ?></span>
+              <button 
+                type="button" 
+                class="filter-chip-remove" 
+                onclick="document.getElementById('cuisine-input').value=''; document.getElementById('filter-form').submit();"
+                aria-label="Remove cuisine filter">
+                ×
+              </button>
+            </div>
+          <?php endif; ?>
+          
+          <?php if ($favoritesOnly): ?>
+            <div class="filter-chip" data-filter-type="favorites_only">
+              <span class="chip-value">⭐ Favorites Only</span>
+              <button 
+                type="button" 
+                class="filter-chip-remove" 
+                onclick="document.getElementById('favorites-input').value=''; document.getElementById('filter-form').submit();"
+                aria-label="Remove favorites filter">
+                ×
+              </button>
+            </div>
+          <?php endif; ?>
+          
+          <!-- Clear All -->
+          <button 
+            type="button" 
+            class="clear-filters-btn"
+            onclick="window.location.href='index.php?action=recipes&sort=<?= h($currentSort) ?>'"
+            aria-label="Clear all filters">
+            Clear all
+          </button>
+        </div>
+      <?php endif; ?>
     </form>
   </div>
-</section>
+</div>
+
+<!-- Include filter JavaScript -->
+<script src="assets/js/filters.js"></script>
 
 <section aria-labelledby="results-heading">
-  <div class="section-header">
-    <div>
-      <h2 id="results-heading">
-        <?= !empty($_GET['favorites_only']) ? '⭐ Favorite Recipes' : 'All Recipes' ?>
-      </h2>
-      <p class="text-muted">
-        <?= count($recipes) ?> recipe<?= count($recipes) !== 1 ? 's' : '' ?> found
-        <?php if (!empty($_GET['search']) || !empty($_GET['cuisine'])): ?>
-          <span style="margin-left: var(--space-s);">
-            • Filtered
-            <?php if (!empty($_GET['search'])): ?>
-              by <strong>"<?= h($_GET['search']) ?>"</strong>
-            <?php endif; ?>
-            <?php if (!empty($_GET['cuisine'])): ?>
-              <span class="chip chip-primary" style="margin-left: var(--space-xs);">
-                <?= ucfirst(h($_GET['cuisine'])) ?>
-              </span>
-            <?php endif; ?>
-          </span>
-        <?php endif; ?>
-      </p>
-    </div>
+
+<section aria-labelledby="results-heading" style="margin-top: var(--space-xl);">
+  <div class="section-header" style="margin-bottom: var(--space-xl);">
+    <h2 id="results-heading" style="font-size: 1.5rem; margin-bottom: var(--space-xs);">
+      <?= $favoritesOnly ? '⭐ Favorite Recipes' : 'All Recipes' ?>
+    </h2>
   </div>
   <?php if (empty($recipes)): ?>
     <div class="card" id="no-recipes-message">
@@ -135,7 +222,7 @@ $last_cuisine = $last_cuisine ?? '';
             <span class="star-icon"><?= $is_fav ? '⭐' : '☆' ?></span>
           </button>
           
-          <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
+          <a href="index.php?action=recipe_detail&id=<?= $recipe['id'] ?>" style="text-decoration: none; color: inherit; display: block; cursor: pointer;">
             <div class="card-image recipe-img">
               <?php if (!empty($recipe['image_url'])): ?>
                 <img src="<?= h($recipe['image_url']) ?>" 

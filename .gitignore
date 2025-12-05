@@ -2,6 +2,8 @@
 .env
 .env.local
 .env.*.local
+.env.production
+.env.*.production
 
 # Markdown files (except README.md)
 *.md
@@ -41,3 +43,14 @@ node_modules/
 # Build files
 build/
 dist/
+
+# Deployment scripts with secrets
+fix_env_on_server.sh
+DEPLOY_NOW.sh
+deploy.sh
+*.sh
+!init_database.sh
+
+# Documentation with secrets
+GOOGLE_OAUTH_SETUP.txt
+AUTH_SETUP.txt
