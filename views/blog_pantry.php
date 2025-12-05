@@ -7,6 +7,8 @@
   <title>10 Tips to Maximize Your Pantry Efficiency - Pantry Pilot Blog</title>
   <link rel="stylesheet" href="assets/landing.css">
   <link rel="stylesheet" href="assets/blog.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
 </head>
 <body class="light-mode">
   <!-- Navigation -->

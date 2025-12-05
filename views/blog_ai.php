@@ -7,6 +7,8 @@
   <title>How to Get Better AI Recipe Recommendations - Pantry Pilot Blog</title>
   <link rel="stylesheet" href="assets/landing.css">
   <link rel="stylesheet" href="assets/blog.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
 </head>
 <body class="light-mode">
   <!-- Navigation -->

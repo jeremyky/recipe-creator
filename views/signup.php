@@ -15,6 +15,8 @@ if (!function_exists('csrf_token')) {
   <meta name="authors" content="Jeremy Ky, Ashley Wu, Shaunak Sinha">
   <title>Sign Up - Pantry Pilot</title>
   <link rel="stylesheet" href="assets/auth.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
 </head>
 <body>
   <div class="auth-container">
